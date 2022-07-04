@@ -44,7 +44,7 @@ class RSSManager:
     def _post_until_latest(self):
         news_to_publish = self._get_unsended_news()
 
-        for i, new_post in enumerate(news_to_publish):
+        for i, new_post in enumerate(reversed(news_to_publish)):
             self.handler.do('send_message', new_post)
 
             is_last_news = i == len(news_to_publish) - 1
@@ -54,9 +54,9 @@ class RSSManager:
     def _append_new_feed(self):
         news_to_publish = self._get_unsended_news()
 
-        for i, new_post in enumerate(news_to_publish):
+        for i, new_post in enumerate(reversed(news_to_publish)):
             self.handler.do('send_message', new_post)
-
+            
             is_last_news = i == len(news_to_publish) - 1
             if is_last_news:
                 self.latest_post_feed = news_to_publish[0].title
