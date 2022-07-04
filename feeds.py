@@ -1,6 +1,7 @@
 import feedparser
 
 from parser import Parser
+from event import EventHandler
 from logger import Logger
 from RSSManager import RSSManager
 
@@ -8,10 +9,9 @@ logger = Logger(2).get_logger()
 
 class Feeds:
 
-    list_data = Parser().get_feeds()
-    latest_feed_posted = ['CERTFR-2022-AVI-596 : Multiples vulnérabilités dans Tenable.sc (01 juillet 2022)']
+    latest_feed_posted = []
 
-    def __init__(self, handler) -> None:
+    def __init__(self, handler: EventHandler) -> None:
         self.handler = handler
 
     def get_status_of_feed(self, all_posts, index_of_current_feed) -> int:
