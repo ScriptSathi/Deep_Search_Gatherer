@@ -47,5 +47,5 @@ class Parser:
     def get_token(self) -> str:
         return self.config['token'] 
   
-    def get_feeds(self) -> List:
+    def get_feeds(self) -> List['str']:
         return self.config['feeds']
