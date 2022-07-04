@@ -6,5 +6,6 @@ class Constants:
     json_conf_path_dir = os.path.join('.')
     default_config = {
             "token": "",
-            "feeds": []
+            "feeds": [],
+            "published_since_default": 86000,
         }

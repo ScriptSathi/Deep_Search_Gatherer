@@ -1,5 +1,6 @@
 import os, json
 from typing import List
+
 from constants import Constants
 from logger import Logger
 
@@ -41,6 +42,9 @@ class Parser:
             if "name" not in feed:
                 current_index = config["feeds"].index(feed)
                 feed["name"] = f"feed-n°-{str(current_index)}"
+
+            if "since_date" not in feed:
+                feed["published_since"] = config["published_since_default"]
         
         return config
 
@@ -49,3 +53,6 @@ class Parser:
   
     def get_feeds(self) -> List['str']:
         return self.config['feeds']
+
+    def get_config(self):
+        return self.config
