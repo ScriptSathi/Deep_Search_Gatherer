@@ -1,14 +1,22 @@
-import feedparser
+import feedparser, datetime
+
+from dateutil import parser
+
+from parser import Parser
+from utils import Utils
+from event import EventHandler
 from logger import Logger
 
 logger = Logger(2).get_logger()
 
 class RSSManager:
-    def __init__(self, feed_url: str, index_of_current_feed: int, latest_post_feed: str, handler) -> None:
-        self.all_posts = self.poll_feed(feed_url)
+    def __init__(self, feed_config, index_of_current_feed: int, latest_post_feed: str, handler: EventHandler, parser: Parser) -> None:
+        self.feed_config = feed_config
+        self.all_posts = self.poll_feed(feed_config['url'])
         self.handler = handler
         self.index_of_current_feed = index_of_current_feed
         self.latest_post_feed = latest_post_feed
+        self.parser = parser
 
     def poll_feed(self, feed_url):
         return feedparser.parse(feed_url).entries
@@ -29,32 +37,43 @@ class RSSManager:
     
     def _nothing_to_post(self, message):
         logger.info(message)
-    
-    def _post_until_latest(self):
-        logger.info(f'POST UNTIL')
-        logger.info(self.index_of_current_feed)
-        
-        news_to_post = self._get_unsended_news()
-        
-        for news in news_to_post:
-            # logger.info('Posted !!')
-            logger.info(f'News: {news.title} posted !')
-            # self.handler.do('send_message', post)
 
+    def _post_until_latest(self):
+        news_to_publish = self._get_unsended_news()
+
+        for new_post in news_to_publish:
+            self.handler.do('send_message', new_post)
 
     def _append_new_feed(self):
-        logger.info(f'APPEND')
-        logger.info(self.index_of_current_feed)
-        # self.add_to_latest_post()
-        # for post in all_posts:
-        #     self.handler.on('send_message', post)
-    
-    def _get_unsended_news(self):
-        news_to_post = []
+        news_to_publish = self._get_unsended_news()
 
-        for new in self.all_posts:
-            if new.title != self.latest_post_feed:
-                news_to_post.append(new)
-            elif new.title == self.latest_post_feed:
-                break
-        return news_to_post
+        for new_post in news_to_publish:
+            self.handler.do('send_message', new_post)
+
+    def _get_unsended_news(self):
+        news_to_publish = []
+
+        if self.latest_post_feed != None: 
+            for new in self.all_posts:
+                if new.title != self.latest_post_feed:
+                    news_to_publish.append(new)
+                elif new.title == self.latest_post_feed:
+                    break
+            return news_to_publish
+        else:
+            for new in self.all_posts:
+                date_time = parser.parse(new['published'])
+                timezone = Utils.get_timezone()
+                time_since_published = timezone.localize(
+                    datetime.datetime.now()
+                ) - date_time.astimezone(timezone)
+                
+                is_not_to_old_news = time_since_published.total_seconds() <= self.feed_config['published_since']
+                
+                if is_not_to_old_news:
+                    news_to_publish.append(new)
+                else:
+                    logger.info('No news to publish')
+                    break
+
+            return news_to_publish
