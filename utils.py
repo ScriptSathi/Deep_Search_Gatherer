@@ -1,5 +1,4 @@
 from logger import Logger
-from pprint import pprint
 import pytz
 
 logger = Logger(2).get_logger()
