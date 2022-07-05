@@ -43,8 +43,11 @@ class Parser:
                 current_index = config["feeds"].index(feed)
                 feed["name"] = f"feed-n°-{str(current_index)}"
 
-            if "since_date" not in feed:
+            if "published_since" not in feed:
                 feed["published_since"] = config["published_since_default"]
+            
+            if "refresh_time" not in feed:
+                feed["refresh_time"] = config["refresh_time"]
         
         return config
 
