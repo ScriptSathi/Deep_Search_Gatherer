@@ -1,4 +1,4 @@
-import os
+import os, discord
 
 class Constants: 
     home_dir = os.environ["HOME"] if "HOME" in os.environ else '/home/rssbot'
