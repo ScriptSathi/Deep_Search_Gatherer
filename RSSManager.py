@@ -1,6 +1,7 @@
-import feedparser, datetime
+import feedparser, datetime, asyncio
 
 from dateutil import parser
+from time import sleep
 
 from parser import Parser
 from utils import Utils
@@ -13,26 +14,26 @@ class RSSManager:
 
     latest_post_feed = None
 
-    def __init__(self, feed_config, index_of_current_feed: int, handler: EventHandler, parser: Parser) -> None:
+    def __init__(self, feed_config, handler: EventHandler, parser: Parser) -> None:
         self.feed_config = feed_config
         self.all_posts = self.poll_feed(feed_config['url'])
         self.handler = handler
-        self.index_of_current_feed = index_of_current_feed
         self.parser = parser
+
+    def run(self) -> None:
+        while True:
+            case = self._get_status_of_feed()
+            self._send_message_if_needed(case) 
+            sleep(5)
 
     def poll_feed(self, feed_url):
         return feedparser.parse(feed_url).entries
-
-    def update_and_return_latest_rss(self):
-        case = self._get_status_of_feed()
-        self._send_message_if_needed(case)
-        return 
 
     def _send_message_if_needed(self, case):
         no_need_to_post, post_until_latest, add_all_post_until_time = (0, 1, 2)
 
         if no_need_to_post == case:
-            self._nothing_to_post('There is no new post on this feed')
+            self._nothing_to_post(f"There is no new post on {self.feed_config['name']}")
         elif post_until_latest == case:
             self._post_until_latest()
         elif add_all_post_until_time == case:

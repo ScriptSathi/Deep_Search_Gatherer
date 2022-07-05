@@ -1,4 +1,5 @@
 import asyncio
+from threading import Thread
 
 from logger import Logger
 from feeds import Feeds
@@ -17,38 +18,14 @@ class RSSBot:
         self.feeds = Feeds(self.handler)
         self.config = self.parser.get_config()
 
-    def crawl_feeds(self):
-        pass
-        # for index_of_current_feed, feed_config in enumerate(self.feeds.list_data):
-
-
-
-
-        # self.feeds.update_feed_posts(latest_post_name, index_of_current_feed)
-        # latest_post_feed = None if len(self.feeds.latest_feed_posted) == 0 else self.feeds.latest_feed_posted[index_of_current_feed]
-
-
-
-
-
-        #         # for index_of_current_feed, feed_config in enumerate(self.feeds.list_data):
-
-        #         rss_manager = RSSManager(feed_config['url'], index_of_current_feed, self.handler)
-
-        #         feed_status_code = self.feeds.get_status_of_feed(rss_manager.all_posts, index_of_current_feed)
-
-        #         latest_post_name = rss_manager.update_and_return_latest_rss(feed_status_code)
-        #         self.feeds.update_feed_posts(latest_post_name, index_of_current_feed)
-
-    async def run(self):
-        index_of_current_feed = 0
-        feed_config = self.config['feeds'][index_of_current_feed]
-        rss_manager = RSSManager(feed_config, index_of_current_feed, self.handler, self.parser)
-        while True:
-            latest_post_name = rss_manager.update_and_return_latest_rss()
-            await asyncio.sleep(5)
+    def run(self):
+        threads = []
+        for feed_config in self.config['feeds']:
+            rss_manager = RSSManager(feed_config, self.handler, self.parser)
+            current_thread = Thread(target=rss_manager.run)
+            threads.append(current_thread)
+            current_thread.start()
 
 if __name__ == "__main__":
-    asyncio.run(
-        RSSBot().run()
-    )
+    RSSBot().run()
+
