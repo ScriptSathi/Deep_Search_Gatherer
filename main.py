@@ -2,7 +2,6 @@ import asyncio
 from threading import Thread
 
 from logger import Logger
-from feeds import Feeds
 from RSSManager import RSSManager
 from event import EventHandler
 from parser import Parser
@@ -15,7 +14,6 @@ class RSSBot:
     parser = Parser()
 
     def __init__(self) -> None:
-        self.feeds = Feeds(self.handler)
         self.config = self.parser.get_config()
 
     def run(self):
