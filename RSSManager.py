@@ -1,4 +1,5 @@
-import feedparser, datetime, asyncio
+from typing import List
+import feedparser, datetime
 
 from dateutil import parser
 from time import sleep
@@ -13,14 +14,15 @@ logger = Logger(2).get_logger()
 class RSSManager:
 
     latest_post_feed = None
+    handler = EventHandler()
 
-    def __init__(self, feed_config, handler: EventHandler, parser: Parser) -> None:
+    def __init__(self, feed_config, chan) -> None:
         self.feed_config = feed_config
+        self.channels = chan
         self.all_posts = self._poll_feed(feed_config['url'])
-        self.handler = handler
-        self.parser = parser
 
-    def run(self) -> None:
+    def run(self, client) -> None:
+        self.handler.setup_events(client, self.channels)
         while True:
             case = self._get_status_of_feed()
             self._send_message_if_needed(case) 
@@ -50,7 +52,8 @@ class RSSManager:
         news_to_publish = self._get_unsended_news()
 
         for i, new_post in enumerate(reversed(news_to_publish)):
-            self.handler.do('send_message', new_post)
+            self.handler.do('send_stdout', new_post)
+            self.handler.do('send_discord', new_post)
 
             is_last_news = i == len(news_to_publish) - 1
             if is_last_news:
@@ -60,8 +63,9 @@ class RSSManager:
         news_to_publish = self._get_unsended_news()
 
         for i, new_post in enumerate(reversed(news_to_publish)):
-            self.handler.do('send_message', new_post)
-            
+            self.handler.do('send_stdout', new_post)
+            self.handler.do('send_discord', new_post)
+
             is_last_news = i == len(news_to_publish) - 1
             if is_last_news:
                 self.latest_post_feed = news_to_publish[0].title
