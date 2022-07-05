@@ -1,9 +1,9 @@
 import discord
 
-from logger import Logger
+from src.logger import Logger
 from parser import Parser
 
-from rss_bot import RSSBot
+from src.rss_bot import RSSBot
 
 logger = Logger.get_logger()
 
