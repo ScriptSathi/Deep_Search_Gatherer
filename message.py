@@ -1,6 +1,6 @@
 from logger import Logger
 
-logger = Logger(2).get_logger()
+logger = Logger.get_logger()
 
 class Message:
     def __init__(self, client, channels, feed_config) -> None:

@@ -4,7 +4,7 @@ from typing import List
 from constants import Constants
 from logger import Logger
 
-logger = Logger(2).get_logger()
+logger = Logger.get_logger()
 
 class Parser:
     def __init__(self) -> None:

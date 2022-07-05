@@ -1,15 +1,13 @@
-from typing import List
 import feedparser, datetime
 
 from dateutil import parser
 from time import sleep
 
-from parser import Parser
 from message import Message
 from utils import Utils
 from logger import Logger
 
-logger = Logger(2).get_logger()
+logger = Logger.get_logger()
 
 class RSSManager:
 

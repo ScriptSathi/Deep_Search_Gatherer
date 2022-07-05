@@ -1,15 +1,11 @@
-import asyncio, discord
-from constants import Constants
-from threading import Thread
+import discord
 
 from logger import Logger
-from RSSManager import RSSManager
 from parser import Parser
-from message import Message
 
 from rss_bot import RSSBot
 
-logger = Logger(0).get_logger()
+logger = Logger.get_logger()
 
 class Client(discord.Client):
 

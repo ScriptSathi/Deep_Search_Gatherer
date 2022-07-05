@@ -1,9 +1,10 @@
+import discord
 from threading import Thread
 
 from RSSManager import RSSManager
 from logger import Logger
 
-logger = Logger(2).get_logger()
+logger = Logger.get_logger()
 
 class RSSBot:
 
@@ -12,13 +13,15 @@ class RSSBot:
         self.config = config
 
     async def run(self):
+        await self.display_bot_game()
+
         for feed_config in self.config['feeds']:
-            channels = await self.get_current_channel(feed_config)
+            channels = await self._get_current_channel(feed_config)
             rss_manager = RSSManager(feed_config, channels)
             thread = Thread(target=rss_manager.run, args=(self.client,))
             thread.start()
 
-    async def get_current_channel(self, feed_config):
+    async def _get_current_channel(self, feed_config):
 
         config_channels = feed_config['channels'].split(',')
         client_channels = []
@@ -28,3 +31,7 @@ class RSSBot:
             logger.info(channel_obj)
             client_channels.append(channel_obj)
         return client_channels
+
+    async def _display_bot_game(self):
+        game_displayed = self.config['game_displayed']
+        await self.client.change_presence(activity=discord.Game(name=game_displayed))
