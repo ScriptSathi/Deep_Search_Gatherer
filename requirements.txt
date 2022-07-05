@@ -1,0 +1,4 @@
+discord.py==1.7.3
+feedparser>=6.0<=7
+html2text==2020.1.16
+python-dateutil>=2.8.0<=3
