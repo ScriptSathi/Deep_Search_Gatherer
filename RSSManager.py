@@ -16,7 +16,7 @@ class RSSManager:
 
     def __init__(self, feed_config, handler: EventHandler, parser: Parser) -> None:
         self.feed_config = feed_config
-        self.all_posts = self.poll_feed(feed_config['url'])
+        self.all_posts = self._poll_feed(feed_config['url'])
         self.handler = handler
         self.parser = parser
 
@@ -24,12 +24,16 @@ class RSSManager:
         while True:
             case = self._get_status_of_feed()
             self._send_message_if_needed(case) 
-            sleep(5)
+            self._sleep_before_refresh()
 
-    def poll_feed(self, feed_url):
+    def _sleep_before_refresh(self) -> None:
+        logger.info(f'Sleep for {self.feed_config["refresh_time"]} before the next refresh')
+        sleep(self.feed_config['refresh_time'])
+
+    def _poll_feed(self, feed_url):
         return feedparser.parse(feed_url).entries
 
-    def _send_message_if_needed(self, case):
+    def _send_message_if_needed(self, case) -> None:
         no_need_to_post, post_until_latest, add_all_post_until_time = (0, 1, 2)
 
         if no_need_to_post == case:
@@ -38,11 +42,11 @@ class RSSManager:
             self._post_until_latest()
         elif add_all_post_until_time == case:
             self._append_new_feed()
-    
-    def _nothing_to_post(self, message):
+
+    def _nothing_to_post(self, message) -> None:
         logger.info(message)
 
-    def _post_until_latest(self):
+    def _post_until_latest(self) -> None:
         news_to_publish = self._get_unsended_news()
 
         for i, new_post in enumerate(reversed(news_to_publish)):
@@ -52,7 +56,7 @@ class RSSManager:
             if is_last_news:
                 self.latest_post_feed = news_to_publish[0].title
 
-    def _append_new_feed(self):
+    def _append_new_feed(self) -> None:
         news_to_publish = self._get_unsended_news()
 
         for i, new_post in enumerate(reversed(news_to_publish)):
