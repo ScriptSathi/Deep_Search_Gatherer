@@ -12,13 +12,11 @@ class RSSBot:
         self.config = config
 
     async def run(self):
-        threads = []
         for feed_config in self.config['feeds']:
             channels = await self.get_current_channel(feed_config)
             rss_manager = RSSManager(feed_config, channels)
-            current_thread = Thread(target=rss_manager.run, args=(self.client,))
-            threads.append(current_thread)
-            current_thread.start()
+            thread = Thread(target=rss_manager.run, args=(self.client,))
+            thread.start()
 
     async def get_current_channel(self, feed_config):
 
