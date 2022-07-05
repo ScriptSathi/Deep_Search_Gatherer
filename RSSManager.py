@@ -24,7 +24,7 @@ class RSSManager:
         self.message = Message(client, self.channels, self.feed_config)
         while True:
             case = self._get_status_of_feed()
-            self._send_message_if_needed(case) 
+            self._send_message_if_needed(case)
             self._sleep_before_refresh()
 
     def _sleep_before_refresh(self) -> None:

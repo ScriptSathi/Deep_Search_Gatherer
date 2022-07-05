@@ -9,7 +9,7 @@ from message import Message
 
 from rss_bot import RSSBot
 
-logger = Logger(2).get_logger()
+logger = Logger(0).get_logger()
 
 class Client(discord.Client):
 
@@ -27,8 +27,7 @@ class Client(discord.Client):
 
     async def my_background_task(self):
         await self.wait_until_ready()
-        while not self.is_closed():
-            await RSSBot(self, self.config).run()
+        await RSSBot(self, self.config).run()
 
 if __name__ == "__main__":
     parser = Parser()
