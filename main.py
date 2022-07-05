@@ -4,7 +4,6 @@ from threading import Thread
 
 from logger import Logger
 from RSSManager import RSSManager
-from event import EventHandler
 from parser import Parser
 from message import Message
 
@@ -38,5 +37,5 @@ if __name__ == "__main__":
     Client(
         chunk_guilds_at_startup=False,
         member_cache_flags=discord.MemberCacheFlags.none(),
-        max_messages=None,).run(token
-    )
+        max_messages=None,
+    ).run(token)
