@@ -1,8 +1,8 @@
 import discord
 from threading import Thread
 
-from RSSManager import RSSManager
-from logger import Logger
+from src.RSSManager import RSSManager
+from src.logger import Logger
 
 logger = Logger.get_logger()
 
@@ -13,7 +13,7 @@ class RSSBot:
         self.config = config
 
     async def run(self):
-        await self.display_bot_game()
+        await self._display_bot_game()
 
         for feed_config in self.config['feeds']:
             channels = await self._get_current_channel(feed_config)
@@ -28,7 +28,6 @@ class RSSBot:
 
         for chan in config_channels:
             channel_obj = await self.client.fetch_channel(chan)
-            logger.info(channel_obj)
             client_channels.append(channel_obj)
         return client_channels
 

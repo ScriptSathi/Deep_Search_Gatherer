@@ -1,7 +1,7 @@
 import discord
 
 from src.logger import Logger
-from parser import Parser
+from src.parser import Parser
 
 from src.rss_bot import RSSBot
 

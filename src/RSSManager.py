@@ -3,9 +3,9 @@ import feedparser, datetime
 from dateutil import parser
 from time import sleep
 
-from message import Message
-from utils import Utils
-from logger import Logger
+from src.message import Message
+from src.utils import Utils
+from src.logger import Logger
 
 logger = Logger.get_logger()
 
