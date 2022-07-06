@@ -1,8 +1,9 @@
-import os, json, requests, re
+import os, json
 from typing import List
 
 from src.constants import Constants
 from src.logger import Logger
+from src.utils import Utils
 
 logger = Logger.get_logger()
 
@@ -33,7 +34,7 @@ class Parser:
         file_list = os.listdir(Constants.json_conf_path_dir)
         for file in file_list:
             if ".json" in file:
-                return file 
+                return file
 
     def _load_config(self) -> str:
         config = Constants.default_config
@@ -57,11 +58,8 @@ class Parser:
             
             if "refresh_time" not in feed:
                 feed["refresh_time"] = config["refresh_time"]
-        
-        return config
 
-    def _get_youtube_feed_url (self, url):
-        consent_cookie = {"CONSENT": "YES+"}
-        html_content = requests.get(url, cookies=consent_cookie).text
-        line_str = re.findall(r"channel_id=([A-Za-z0-9\-\_]+)", html_content)
-        return f'https://www.youtube.com/feeds/videos.xml?channel_id={line_str[0]}'
+            if 'youtu' in feed['url']:
+                feed['url'] = Utils.get_youtube_feed_url(feed['url'])
+
+        return config
