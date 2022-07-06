@@ -11,7 +11,6 @@ class Client(discord.Client):
 
     def __init__(self, **discord_params) -> None:
         super().__init__(**discord_params)
-        parser = Parser()
         config = parser.get_config()
 
         self.config = config
