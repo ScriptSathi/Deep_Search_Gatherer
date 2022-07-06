@@ -1,11 +1,11 @@
-from logger import Logger
+from src.logger import Logger
 import pytz
 
-logger = Logger(2).get_logger()
+logger = Logger.get_logger()
 
 class Utils:
     def get_timezone():
-        tz = 'UTC'
+        tz = 'Europe/Paris'
         try:
             timezone = pytz.timezone(tz)
         except Exception:
