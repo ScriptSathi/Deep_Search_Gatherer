@@ -89,7 +89,7 @@ class RSSManager:
                     break
 
         if news_to_publish == []:
-            logger.info('No news to publish')
+            logger.info(f"{self.feed_config['name']}: The latest posts are too old")
 
         return news_to_publish
 
