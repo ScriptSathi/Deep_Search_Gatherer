@@ -18,9 +18,9 @@ class Client(discord.Client):
     async def on_ready(self) -> None:
         logger.info(f'Logged in as {self.user} (ID: {self.user.id})')
         logger.info('------')
-        await self.loop.create_task(self.my_background_task())
+        await self.loop.create_task(self._prepare_and_run())
 
-    async def my_background_task(self):
+    async def _prepare_and_run(self):
         await self.wait_until_ready()
         await RSSBot(self, self.config).run()
 
