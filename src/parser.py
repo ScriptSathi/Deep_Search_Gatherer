@@ -1,14 +1,23 @@
-import os, json
+import os, json, requests, re
 from typing import List
 
-from constants import Constants
-from logger import Logger
+from src.constants import Constants
+from src.logger import Logger
 
 logger = Logger.get_logger()
 
 class Parser:
     def __init__(self) -> None:
         self.config = self._load_config()
+
+    def get_token(self) -> str:
+        return self.config['token']
+
+    def get_feeds(self) -> List['str']:
+        return self.config['feeds']
+
+    def get_config(self):
+        return self.config
 
     def _is_valid_json_file(self, file_path) -> bool:
         try:
@@ -51,11 +60,8 @@ class Parser:
         
         return config
 
-    def get_token(self) -> str:
-        return self.config['token'] 
-  
-    def get_feeds(self) -> List['str']:
-        return self.config['feeds']
-
-    def get_config(self):
-        return self.config
+    def _get_youtube_feed_url (self, url):
+        consent_cookie = {"CONSENT": "YES+"}
+        html_content = requests.get(url, cookies=consent_cookie).text
+        line_str = re.findall(r"channel_id=([A-Za-z0-9\-\_]+)", html_content)
+        return f'https://www.youtube.com/feeds/videos.xml?channel_id={line_str[0]}'
