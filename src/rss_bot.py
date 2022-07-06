@@ -1,7 +1,7 @@
 import discord
 from threading import Thread
 
-from src.RSSManager import RSSManager
+from feed import Feed
 from src.logger import Logger
 
 logger = Logger.get_logger()
@@ -17,7 +17,7 @@ class RSSBot:
 
         for feed_config in self.config['feeds']:
             channels = await self._get_current_channel(feed_config)
-            rss_manager = RSSManager(feed_config, channels)
+            rss_manager = Feed(feed_config, channels)
             thread = Thread(target=rss_manager.run, args=(self.client,))
             thread.start()
 

@@ -9,7 +9,7 @@ from src.logger import Logger
 
 logger = Logger.get_logger()
 
-class RSSManager:
+class Feed:
 
     latest_post_feed = None
 
