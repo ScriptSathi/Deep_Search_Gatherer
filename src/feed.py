@@ -1,4 +1,4 @@
-import feedparser, datetime
+import feedparser, datetime, os, json
 
 from dateutil import parser
 from time import sleep
@@ -6,14 +6,14 @@ from time import sleep
 from src.message import Message
 from src.utils import Utils
 from src.logger import Logger
+from src.constants import Constants
 
 logger = Logger.get_logger()
 
 class Feed:
 
-    latest_post_feed = None
-
     def __init__(self, feed_config, chan) -> None:
+        self.latest_post_feed = self._read_latest_post_file()
         self.feed_config = feed_config
         self.channels = chan
         self.all_posts = self._poll_feed(feed_config['url'])
@@ -24,6 +24,28 @@ class Feed:
             case = self._get_status_of_feed()
             self._send_message_if_needed(case)
             self._sleep_before_refresh()
+
+    def _read_latest_post_file(self):
+        file_path = Constants.json_latest_post_data_path
+        unparsed_data = '{}'
+
+        if os.path.isfile(file_path):
+            with open(file_path, 'r') as file_buff:
+                unparsed_data = file_buff.read()
+        else:
+            with open(file_path, 'w') as file_buff:
+                file_buff.write(unparsed_data)
+        return json.loads(unparsed_data)
+
+    def _register_latest_post_file(self):
+        file_path = Constants.json_latest_post_data_path
+
+        with open(file_path, 'w') as file_buff:
+            file_buff.write(json.dumps(self.latest_post_feed))
+    
+    def _update_latest_post_data(self, news_content):
+            feed_name = self.feed_config['name']
+            self.latest_post_feed[feed_name] = news_content
 
     def _sleep_before_refresh(self) -> None:
         logger.info(f'Sleep for {self.feed_config["refresh_time"]} before the next refresh')
@@ -53,7 +75,8 @@ class Feed:
 
             is_last_news = i == len(news_to_publish) - 1
             if is_last_news:
-                self.latest_post_feed = news_to_publish[0].title
+                self._update_latest_post_data(news_to_publish[0].title)
+        self._register_latest_post_file()
 
     def _append_new_feed(self) -> None:
         news_to_publish = self._get_unsended_news()
@@ -62,7 +85,8 @@ class Feed:
             self.message.send_message(new_post)
             is_last_news = i == len(news_to_publish) - 1
             if is_last_news:
-                self.latest_post_feed = news_to_publish[0].title
+                self._update_latest_post_data(news_to_publish[0].title)
+        self._register_latest_post_file()
 
     def _get_unsended_news(self):
         news_to_publish = []
