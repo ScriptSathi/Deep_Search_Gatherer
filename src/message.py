@@ -10,7 +10,6 @@ class Message:
 
     def parse_html(html_content): 
         htmlfixer = HTML2Text()
-        logger.info(htmlfixer)
         htmlfixer.ignore_links = True
         htmlfixer.ignore_images = True
         htmlfixer.ignore_emphasis = False

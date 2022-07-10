@@ -1,7 +1,7 @@
 import discord
 from threading import Thread
 
-from feed import Feed
+from src.feed import Feed
 from src.logger import Logger
 
 logger = Logger.get_logger()
