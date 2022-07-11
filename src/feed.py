@@ -48,7 +48,7 @@ class Feed:
             self.latest_post_feed[feed_name] = news_content
 
     def _sleep_before_refresh(self) -> None:
-        logger.info(f'Sleep for {self.feed_config["refresh_time"]} before the next refresh')
+        logger.info(f'{self.feed_config["name"]} - sleep for {self.feed_config["refresh_time"]} before the next refresh')
         sleep(self.feed_config['refresh_time'])
 
     def _poll_feed(self, feed_url):
@@ -90,32 +90,35 @@ class Feed:
 
     def _get_unsended_news(self):
         news_to_publish = []
+        feed_name = self.feed_config['name']
+        feed_already_registered = feed_name in self.latest_post_feed
 
-        if self.latest_post_feed != None: 
+        if feed_already_registered:
             for single_news in self.all_posts:
-                if single_news.title != self.latest_post_feed:
+                if single_news.title != self.latest_post_feed[feed_name]:
                     news_to_publish.append(single_news)
-                elif single_news.title == self.latest_post_feed:
+                elif single_news.title == self.latest_post_feed or not self._is_too_old_news(single_news):
                     break
         else:
             for single_news in self.all_posts:
-                date_time = parser.parse(single_news['published'])
-                timezone = Utils.get_timezone()
-                time_since_published = timezone.localize(
-                    datetime.datetime.now()
-                ) - date_time.astimezone(timezone)
-                
-                is_not_to_old_news = time_since_published.total_seconds() <= self.feed_config['published_since']
-                
-                if is_not_to_old_news:
+                if not self._is_too_old_news(single_news):
+                    logger.info('\n\n OK\n\n')
                     news_to_publish.append(single_news)
                 else:
                     break
 
         if news_to_publish == []:
-            logger.info(f"{self.feed_config['name']}: The latest posts are too old")
+            logger.info(f"{self.feed_config['name']}: No news to share")
 
         return news_to_publish
+
+    def _is_too_old_news(self, single_news):
+        date_time = parser.parse(single_news['published'])
+        timezone = Utils.get_timezone()
+        time_since_published = timezone.localize(
+            datetime.datetime.now()
+        ) - date_time.astimezone(timezone)
+        return not time_since_published.total_seconds() <= self.feed_config['published_since']
 
     def _get_status_of_feed(self) -> int:
 
