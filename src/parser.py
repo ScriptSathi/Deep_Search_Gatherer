@@ -51,7 +51,7 @@ class Parser:
                 
             if "name" not in feed:
                 current_index = config["feeds"].index(feed)
-                feed["name"] = f"feed-n°-{str(current_index)}"
+                feed["name"] = f"feed-{str(current_index)}"
 
             if "published_since" not in feed:
                 feed["published_since"] = config["published_since_default"]
