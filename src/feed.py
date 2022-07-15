@@ -1,7 +1,7 @@
-import feedparser, datetime, os, json
+import feedparser, datetime, os, json, sys
 
 from dateutil import parser
-from time import sleep
+
 
 from src.message import Message
 from src.utils import Utils
@@ -23,7 +23,7 @@ class Feed:
         while True:
             case = self._get_status_of_feed()
             self._send_message_if_needed(case)
-            self._sleep_before_refresh()
+            self._close_thread_after_usage()
 
     def _read_latest_post_file(self):
         file_path = Constants.json_latest_post_data_path
@@ -47,9 +47,9 @@ class Feed:
             feed_name = self.feed_config['name']
             self.latest_post_feed[feed_name] = news_content
 
-    def _sleep_before_refresh(self) -> None:
-        logger.info(f'{self.feed_config["name"]} - sleep for {self.feed_config["refresh_time"]} before the next refresh')
-        sleep(self.feed_config['refresh_time'])
+    def _close_thread_after_usage(self) -> None:
+        logger.info(f'{self.feed_config["name"]} - Exit after clean usage')
+        sys.exit()
 
     def _poll_feed(self, feed_url):
         return feedparser.parse(feed_url).entries
@@ -102,7 +102,6 @@ class Feed:
         else:
             for single_news in self.all_posts:
                 if not self._is_too_old_news(single_news):
-                    logger.info('\n\n OK\n\n')
                     news_to_publish.append(single_news)
                 else:
                     break
