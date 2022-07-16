@@ -68,7 +68,7 @@ You can avoid using json config file by simply adding token and feeds through en
 |----|----| ----|
 | `token` | Your bot token, it's **mandatory** variable. | "" |
 | `feeds` | The feeds you want to be used by the bot. Each feeds in the list must be an object with at least a `url`and `channel` set. <ul><li>`name` Name of the feed (default: `feed-n°X`)<li>`url` **mandatory** Url of the feed (default: `''`)</li><li>`channel` **mandatory** Channel where to display the feed (default: `''`)</li><li>`published_since` Maximum age of latest news to be posted (default: is the value of `published_since_default`)</li>| [] |
-| `refresh-time` | Time between refreshes of a feed, in second | 300 |
+| `refresh-time` | Time between refreshes of a feed, in second | 900 |
 | `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set | 86400 |
 | `gameplayed` | Change the game displayed in bot profile | "Eating some RSS feeds" |
 
