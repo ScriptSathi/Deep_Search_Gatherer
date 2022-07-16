@@ -1,4 +1,4 @@
-import discord, functools, os, json
+import discord, functools, os, json, asyncio
 from threading import Thread
 from time import sleep
 
@@ -23,9 +23,9 @@ class RSSBot:
                 rss_manager = Feed(feed_config, channels, latest_post_in_feed)
                 thread = Thread(target=rss_manager.run, args=(self.client,))
                 thread.start()
-            self._sleep_before_refresh()
-    async def _get_current_channel(self, feed_config):
+            await self._sleep_before_refresh()
 
+    async def _get_current_channel(self, feed_config):
         config_channels = feed_config['channels'].split(',')
         client_channels = []
 
@@ -53,7 +53,7 @@ class RSSBot:
                 file_buff.write(file_data)
         return file_data
 
-    def _sleep_before_refresh(self) -> None:
+    async def _sleep_before_refresh(self) -> None:
         refresh_time = self.config['refresh_time']
         logger.info(f'Sleep for {refresh_time}s before the next refresh')
-        sleep(refresh_time)
+        await asyncio.sleep(refresh_time)

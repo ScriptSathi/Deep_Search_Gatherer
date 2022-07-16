@@ -35,7 +35,6 @@ class Feed:
         self.latest_post = news_content
 
     def _close_thread_after_usage(self) -> None:
-        logger.info(f'{self.feed_config["name"]} - Exit after clean usage')
         sys.exit()
 
     def _poll_feed(self, feed_url):
