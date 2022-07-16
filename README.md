@@ -83,4 +83,6 @@ docker rm rssbot
 
 To follow a youtube channel just put the youtube url in the `url` field.
 
-Format tested: `https://www.youtube.com/c/<Channel-Name>`
+Format tested: 
+- `https://www.youtube.com/c/<Channel-Name>`
+- `https://www.youtube.com/user/<Channel-Name>`
