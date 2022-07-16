@@ -12,8 +12,8 @@ logger = Logger.get_logger()
 
 class Feed:
 
-    def __init__(self, feed_config, chan) -> None:
-        self.latest_post_feed = self._read_latest_post_file()
+    def __init__(self, feed_config, chan, latest_post) -> None:
+        self.latest_post = latest_post
         self.feed_config = feed_config
         self.channels = chan
         self.all_posts = self._poll_feed(feed_config['url'])
@@ -25,27 +25,14 @@ class Feed:
             self._send_message_if_needed(case)
             self._close_thread_after_usage()
 
-    def _read_latest_post_file(self):
-        file_path = Constants.json_latest_post_data_path
-        unparsed_data = '{}'
-
-        if os.path.isfile(file_path):
-            with open(file_path, 'r') as file_buff:
-                unparsed_data = file_buff.read()
-        else:
-            with open(file_path, 'w') as file_buff:
-                file_buff.write(unparsed_data)
-        return json.loads(unparsed_data)
-
     def _register_latest_post_file(self):
-        file_path = Constants.json_latest_post_data_path
+        file_path = Constants.feeds_data_dir + '/' + self.feed_config['name']
 
         with open(file_path, 'w') as file_buff:
-            file_buff.write(json.dumps(self.latest_post_feed))
-    
+            file_buff.write(self.latest_post)
+
     def _update_latest_post_data(self, news_content):
-            feed_name = self.feed_config['name']
-            self.latest_post_feed[feed_name] = news_content
+        self.latest_post = news_content
 
     def _close_thread_after_usage(self) -> None:
         logger.info(f'{self.feed_config["name"]} - Exit after clean usage')
@@ -90,14 +77,13 @@ class Feed:
 
     def _get_unsended_news(self):
         news_to_publish = []
-        feed_name = self.feed_config['name']
-        feed_already_registered = feed_name in self.latest_post_feed
+        feed_already_registered = self.latest_post != ''
 
         if feed_already_registered:
             for single_news in self.all_posts:
-                if single_news.title != self.latest_post_feed[feed_name]:
+                if single_news.title != self.latest_post:
                     news_to_publish.append(single_news)
-                elif single_news.title == self.latest_post_feed or not self._is_too_old_news(single_news):
+                elif single_news.title == self.latest_post or not self._is_too_old_news(single_news):
                     break
         else:
             for single_news in self.all_posts:
@@ -122,9 +108,10 @@ class Feed:
     def _get_status_of_feed(self) -> int:
 
         no_need_to_post, post_until_latest, add_all_post_until_time = (0, 1, 2)
+        feed_already_registered = self.latest_post != ''
 
-        if self.latest_post_feed != None:
-            current_feed_is_registered = self.all_posts[0].title == self.latest_post_feed
+        if feed_already_registered:
+            current_feed_is_registered = self.all_posts[0].title == self.latest_post
             if current_feed_is_registered:
                 return no_need_to_post
             else: 

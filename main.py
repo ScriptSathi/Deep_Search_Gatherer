@@ -11,8 +11,6 @@ class Client(discord.Client):
 
     def __init__(self, **discord_params) -> None:
         super().__init__(**discord_params)
-        config = parser.get_config()
-
         self.config = config
 
     async def on_ready(self) -> None:
@@ -26,10 +24,12 @@ class Client(discord.Client):
 
 if __name__ == "__main__":
     parser = Parser()
+    config = parser.get_config()
     token = parser.get_token()
 
     Client(
         chunk_guilds_at_startup=False,
         member_cache_flags=discord.MemberCacheFlags.none(),
         max_messages=None,
+        heartbeat_timeout=config['refresh_time']+5
     ).run(token)
