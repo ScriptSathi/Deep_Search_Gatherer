@@ -6,7 +6,6 @@ class RSSBuilder
         @description = rss_data['description']
         @url = rss_data['url']
         @items = rss_data['items']
-        # puts @items
     end
 
     def render_rss_feed

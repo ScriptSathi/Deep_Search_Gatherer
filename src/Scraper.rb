@@ -3,7 +3,7 @@ require 'uri'
 
 require_relative 'Utils'
 
-class Extractor
+class Scraper
 
     def initialize(url)
         @url = url
@@ -13,7 +13,7 @@ class Extractor
     end
     public :initialize
 
-    def render_rss_data
+    def render_news_data
         unparsed_divs_list = self._build_unparsed_divs_list
         html_articles = self._render_articles_list(unparsed_divs_list)
         items = []
@@ -34,7 +34,7 @@ class Extractor
         rss_data['items'] = items
         return rss_data
     end
-    public :render_rss_data
+    public :render_news_data
 
     def _render_articles_list(unparsed_divs_list)
         def sort_biggest_array(arr, max_length)
