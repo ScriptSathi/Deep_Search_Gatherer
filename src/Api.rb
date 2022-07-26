@@ -1,18 +1,29 @@
 require "roda"
 
+require_relative 'Extractor'
+require_relative 'RSSBuilder'
+
 class App < Roda
-  route do |r|
-    # GET / request
-    r.root do
-      r.redirect "/create"
+
+  fail_output = "Please submit an url at /create?url=\"YOUR_URL\""
+
+  route do |req|
+    # GET / req
+    req.root do
+      fail_output.to_s
     end
-    r.on 'create' do
-      r.get do
-        if r.params.has_key?("url")
-          "#{r.params['url']}"
+    req.on 'create' do
+      req.get do
+        if req.params.has_key?('url')
+          extractor = Extractor.new(req.params['url'])
+          rss_data = extractor.render_rss_data
+          rss_builder = RSSBuilder.new(rss_data)
+          puts rss_builder.render_rss_feed
+          # "URL: #{req.params['url']}\n#{rss_builder.render_rss_feed}"
+          "URL: #{req.params['url']}\nhello"
+        else
+          fail_output.to_s
         end
-        "#{r.params['url']}:#{r.params.has_key?("url")}"
-        # "Please submit an url at /create?url=<YOUR URL>"
       end
     end
   end
