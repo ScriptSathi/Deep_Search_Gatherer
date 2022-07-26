@@ -1,8 +1,4 @@
-This project is a WIP. The scraper is working and make an RSS feed, but the api isn't build yet.
-If you want to use it, check the code below. 
-**The RSS feed is currently visible in the logs of the container after you submit the url to the api**
-
-# [Youtube and RSS discord bot ](https://github.com/ScriptSathi/discord_rss)
+# [Scrape2RSS](https://github.com/ScriptSathi/scrape2RSS)
 
 This project take an url as entry with articles you wanted to follow, and return an RSS feed
 
@@ -28,6 +24,8 @@ docker run -d -p 9292:9292 --name=scrape2rss scrape2rss
 ## Generate the RSS feed
 After the application is correctly initialized, just submit a url like this 
 ```
-http://localhost:9292/create?url=<YOUR_URL>
+curl http://localhost:9292/create?url=<YOUR_URL>
 ```
 And it will return the RSS feed
+
+Or you can simply use the browser and the `ctrl+u` to view the source and have the xml output

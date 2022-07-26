@@ -18,9 +18,7 @@ class App < Roda
           extractor = Extractor.new(req.params['url'])
           rss_data = extractor.render_rss_data
           rss_builder = RSSBuilder.new(rss_data)
-          puts rss_builder.render_rss_feed
-          # "URL: #{req.params['url']}\n#{rss_builder.render_rss_feed}"
-          "URL: #{req.params['url']}\nhello"
+          "#{rss_builder.render_rss_feed}"
         else
           fail_output.to_s
         end
