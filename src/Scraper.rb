@@ -23,7 +23,7 @@ class Scraper
             item['description'] = ""
             item['link'] = self._extract_article_link(html_article)
             item['author'] = ""
-            item['pubDate'] = ""
+            item['pubDate'] = Time.now.to_s
             items.append(item)
         end
 

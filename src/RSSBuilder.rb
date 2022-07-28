@@ -22,7 +22,7 @@ class RSSBuilder
                     item.title = item_data['title']
                     item.description = item_data['description']
                     item.author = item_data['author']
-                    item.pubDate = item_data.has_key?('pubDate') ? item_data['pubDate'] : Time.now.to_s
+                    item.pubDate = item_data['pubDate']
                 end
             end
         end

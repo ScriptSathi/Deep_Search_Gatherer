@@ -1,6 +1,6 @@
 require "roda"
 
-require_relative 'Extractor'
+require_relative 'Scraper'
 require_relative 'RSSBuilder'
 
 class App < Roda
@@ -15,8 +15,8 @@ class App < Roda
     req.on 'create' do
       req.get do
         if req.params.has_key?('url')
-          extractor = Extractor.new(req.params['url'])
-          rss_data = extractor.render_rss_data
+          scraper = Scraper.new(req.params['url'])
+          rss_data = scraper.render_news_data
           rss_builder = RSSBuilder.new(rss_data)
           "#{rss_builder.render_rss_feed}"
         else
