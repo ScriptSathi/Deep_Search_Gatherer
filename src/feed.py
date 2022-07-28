@@ -1,12 +1,12 @@
-import feedparser, datetime, os, json, sys
+import feedparser, datetime, sys
 
 from dateutil import parser
-
 
 from src.message import Message
 from src.utils import Utils
 from src.logger import Logger
 from src.constants import Constants
+from src.rss_gen import RSSGenerator
 
 logger = Logger.get_logger()
 
@@ -16,7 +16,7 @@ class Feed:
         self.latest_post = latest_post
         self.feed_config = feed_config
         self.channels = chan
-        self.all_posts = self._poll_feed(feed_config['url'])
+        self.all_posts = self._get_xml_feed(feed_config['url'])
 
     def run(self, client) -> None:
         self.message = Message(client, self.channels, self.feed_config)
@@ -37,8 +37,15 @@ class Feed:
     def _close_thread_after_usage(self) -> None:
         sys.exit()
 
-    def _poll_feed(self, feed_url):
-        return feedparser.parse(feed_url).entries
+    def _get_xml_feed(self, feed_url):
+        xml_entries = feedparser.parse(feed_url).entries
+        if xml_entries != []:
+            return xml_entries
+        elif RSSGenerator.generator_exist():
+            rss_feed = RSSGenerator(feed_url).render_xml_feed()
+            return feedparser.parse(rss_feed).entries
+        else:
+            raise Exception(f"URL: {feed_url} is not a valid url")
 
     def _send_message_if_needed(self, case) -> None:
         no_need_to_post, post_until_latest, add_all_post_until_time = (0, 1, 2)

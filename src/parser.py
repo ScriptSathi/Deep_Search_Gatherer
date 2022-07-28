@@ -46,9 +46,6 @@ class Parser:
                 config[key] = value
 
         for feed in config["feeds"]:
-            if "fields" not in feed:
-                feed["fields"] = "**title**,author,_published_,link,summary"
-                
             if "name" not in feed:
                 current_index = config["feeds"].index(feed)
                 feed["name"] = f"feed-{str(current_index)}"

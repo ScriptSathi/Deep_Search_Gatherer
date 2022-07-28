@@ -20,7 +20,11 @@ class Message:
         return re.sub("<[^<]+?>", "", markdownfield)
 
     def render_author(news):
-        if 'author  s' or 'author' in news:
+        if 'authors' or 'author' in news:
+            if (news['authors'][0]) == {}:
+                (news['authors'][0]).name = "Unknow author"
+            elif news['author'] == {}:
+                news['author'].name = "Unknow author"
             if 'authors' in news:
                 str_authors = 'Author: '
                 if len(news['authors']) == 1:

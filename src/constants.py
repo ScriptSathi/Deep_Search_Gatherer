@@ -11,3 +11,5 @@ class Constants:
         "refresh_time": 900,
         'game_displayed': "Eating some RSS feeds",
     }
+    # api_url = "http://api:9292"
+    api_url = "http://localhost:9292"
