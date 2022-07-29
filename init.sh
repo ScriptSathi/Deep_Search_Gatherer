@@ -6,9 +6,10 @@ build_docker_image(){
 }
 
 main(){
-    git submodule init
+    mkdir -p config_file/
+    git submodule update --init --recursive
     build_docker_image "rssbot" "externals/discord_information_gatherer"
-    build_docker_image "scrape2RSS" "externals/scrape2RSS"
+    build_docker_image "scrape2rss" "externals/scrape2RSS"
 }
 
 main
