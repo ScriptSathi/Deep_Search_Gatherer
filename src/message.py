@@ -21,20 +21,19 @@ class Message:
 
     def render_author(news):
         if 'authors' or 'author' in news:
-            if (news['authors'][0]) == {}:
-                (news['authors'][0]).name = "Unknow author"
-            elif news['author'] == {}:
-                news['author'].name = "Unknow author"
             if 'authors' in news:
-                str_authors = 'Author: '
-                if len(news['authors']) == 1:
-                    str_authors += (news['authors'][0]).name
-                else: 
-                    for author in news['authors']:
-                        str_authors += author.name + ', '
-                return str_authors
-            elif 'author' in news: 
-                return news['author'].name
+                if news['authors'][0] == {}:
+                    return "Unknow authors"
+                else:
+                    str_authors = 'Author: '
+                    if len(news['authors']) == 1:
+                        str_authors += (news['authors'][0]).name
+                    else:
+                        for author in news['authors']:
+                            str_authors += author.name + ', '
+                    return str_authors
+            elif 'author' in news:
+                return "Unknow author" if news['author'] == {} else news['author'].name
         return ''
 
     def is_youtube_feed(news):

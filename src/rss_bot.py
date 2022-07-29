@@ -26,7 +26,7 @@ class RSSBot:
             await self._sleep_before_refresh()
 
     async def _get_current_channel(self, feed_config):
-        config_channels = feed_config['channels'].split(',')
+        config_channels = str(feed_config['channels']).split(',')
         client_channels = []
 
         for chan in config_channels:

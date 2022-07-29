@@ -19,26 +19,37 @@ Simply run the following command from this project source directory to build you
 ```
 docker build -t rssbot .
 ```
-
 ## Simple running command
-The file don't need to be called `config.json` but need to be placed in `/config` folder. The file must be in a valid **JSON format**
+The configuration file is compatible with either `json` and `yaml` (or `yml`) format.
+To understand how this project must be run, we will take the example with a valid yaml configuration file
+The file don't need to be called `config.yaml` but need to be placed in `/config` folder. The file must be in a valid **JSON format**
 ```
-docker run -d -v $(pwd)/config.json:/config/config.json --name=rssbot rssbot
+docker run -d -v $(pwd)/config.yaml:/config/config.yaml --name=rssbot rssbot
 ```
-
 ## Minimal configuration needed 
 ```
-{
-    "token": "<TOKEN>",
-    "feeds": [
-                {
-            "channel": "<CHANNEL>",
-            "url": "<RSS_FEED_URL>",
-        }
-    ]
-}
+token: <TOKEN>
+feeds:
+    - channel: <CHANNEL>
+      url: <RSS_FEED_URL>
 ```
-## Full configuration exemple
+## YAML configuration example
+```
+token: OTg1MzgZE3cwNDQyMTF67TU5.GFl0nX.WeyI8vqX3yO6kqh8Oia6cDpgEkZ1zH6eNHN9w8
+feeds:
+    - name: MY-AMAZING-FEED
+      channel": 984379931012256123,98437993101227456
+      url: https://www.cert.ssi.gouv.fr/alerte/feed/
+    - name: A-BETTER-FEED
+      channel: 984379931012256123
+      url: https://www.youtube.com/c/LiveOverflow
+      published_since: 6
+published_since_default: 86000
+refresh_time: 900
+game_displayed: Eating some RSS feeds
+```
+
+## JSON configuration example
 ```
 {
     "token": "OTg1MzgZE3cwNDQyMTF67TU5.GFl0nX.WeyI8vqX3yO6kqh8Oia6cDpgEkZ1zH6eNHN9w8",
@@ -56,7 +67,7 @@ docker run -d -v $(pwd)/config.json:/config/config.json --name=rssbot rssbot
         }
     ],
     "published_since_default": 86000,
-    "refresh_time": 300,
+    "refresh_time": 900,
     "game_displayed": "Eating some RSS feeds",
 }
 ```
