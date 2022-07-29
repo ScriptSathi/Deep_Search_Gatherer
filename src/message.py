@@ -63,11 +63,11 @@ class Message:
 
         title = f'***{news.title}***'
         author = f'*{auth}*' if auth != '' else ''
-        published = news.published if not Message.is_youtube_feed(news) else ''
+        # published = news.published if not Message.is_youtube_feed(news) else ''
         link = news.link
         summary = Message.parse_html(news.summary) if not Message.is_youtube_feed(news) else ''
 
-        for field in (title, author, published, link, summary):
+        for field in (title, author, link, summary):
             if field != '' :
                 message += field + '\n'                
 
