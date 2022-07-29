@@ -1,9 +1,0 @@
-{
-    "token": "<TOKEN>",
-    "feeds": [
-                {
-            "channel": "<CHANNEL>",
-            "url": "<RSS_FEED_URL>"
-        }
-    ]
-}

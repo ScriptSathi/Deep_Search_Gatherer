@@ -1,0 +1,12 @@
+token: OTg1MzgZE3cwNDQyMTF67TU5.GFl0nX.WeyI8vqX3yO6kqh8Oia6cDpgEkZ1zH6eNHN9w8
+feeds:
+    - name: MY-AMAZING-FEED
+      channel": 984379931012256123,98437993101227456
+      url: https://www.cert.ssi.gouv.fr/alerte/feed/
+    - name: A-BETTER-FEED
+      channel: 984379931012256123
+      url: https://www.youtube.com/c/LiveOverflow
+      published_since: 6
+published_since_default: 86000
+refresh_time: 900
+game_displayed: Eating some RSS feeds
