@@ -14,6 +14,7 @@ class Scraper
     public :initialize
 
     def render_news_data
+        
         unparsed_divs_list = self._build_unparsed_divs_list
         html_articles = self._render_articles_list(unparsed_divs_list)
         items = []
@@ -26,7 +27,7 @@ class Scraper
             item['pubDate'] = Time.now.to_s
             items.append(item)
         end
-
+        items = self._remove_duplicates(items)
         rss_data = {}
         rss_data['title'] = self.method(:_extract_page_title).call
         rss_data['description'] = ''
@@ -110,18 +111,49 @@ class Scraper
     private :_has_image
 
     def _has_title(div)
-        image_exist = 0
+        title_exist = 0
         titles = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         title_type = ''
         titles.each do |title|
             div.css(title).each do |img|
                 title_type = title
-                image_exist = 1
+                title_exist = 1
             end
         end
-        return image_exist, title_type
+        return title_exist, title_type
     end
     private :_has_title
+
+    def _remove_duplicates(articles_list)
+        def is_the_same(array_key, article_to_test, article)
+            for key in array_key
+                if (article_to_test[key] == article[key] &&
+                    article_to_test[key] != "" &&
+                    article[key] != "")
+                    return true
+                end
+            end
+            return false
+        end
+
+        first_article = articles_list[0]
+        last_article = articles_list[articles_list.length - 1]
+        articles_to_remove = []
+        articles_list.each_with_index do |article, i|
+            articles_list.each_with_index do |article_to_test, j|
+                if is_the_same(['title', 'link', 'description'], article_to_test, article)
+                    if i != j
+                        articles_to_remove.append(j)
+                    end
+                end
+            end
+        end
+        for index_to_delete in articles_to_remove
+            articles_list.delete_at(index_to_delete)
+        end
+        return articles_list.uniq
+    end
+    private :_remove_duplicates
 
     def _extract_article_link(html_article)
         links = html_article.css('a').map { 
