@@ -1,4 +1,4 @@
-config.json
-config.yaml
-config.yml
+*.yaml
+*.yml
+*.json
 config_file/*
