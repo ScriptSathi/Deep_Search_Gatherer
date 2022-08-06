@@ -3,19 +3,14 @@ services:
   bot:
     image: rssbot
     restart: on-failure
-    network_mode: host
     configs:
       - source: discord_bot_config_file
         target: /config/
-
-
-  api:
+    depends_on:
+      - scrape2rss
+  scrape2rss:
     image: scrape2rss
     restart: on-failure
-    network_mode: host
-    # ports:
-    #   - "9292:9292"
-
 configs:
   discord_bot_config_file:
     file: ./config_file
