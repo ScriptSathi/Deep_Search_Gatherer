@@ -1,5 +1,9 @@
 # [Deep search gatherer](https://github.com/ScriptSathi/Deep_Search_Gatherer)
 
+## Prerequisite
+
+- Docker Compose version v2.6.0
+
 ## Introduction
 
 This project is a full featured RSS **discord bot** using 2 services over a docker compose. It is used to track RSS feeds / youtube channels or common websites and post it over discord channels
