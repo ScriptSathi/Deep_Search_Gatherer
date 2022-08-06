@@ -1,4 +1,4 @@
-import requests, pprint
+import requests
 
 from src.constants import Constants
 

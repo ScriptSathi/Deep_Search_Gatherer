@@ -12,11 +12,12 @@ logger = Logger.get_logger()
 
 class Feed:
 
-    def __init__(self, feed_config, chan, latest_post) -> None:
+    def __init__(self, feed_config, chan, latest_post, generator_exist = False) -> None:
         self.latest_post = latest_post
         self.feed_config = feed_config
         self.channels = chan
-        self.all_posts = self._get_xml_feed(feed_config['url'])
+
+        self.all_posts = self._get_xml_feed(feed_config['url'], generator_exist)
 
     def run(self, client) -> None:
         self.message = Message(client, self.channels, self.feed_config)
@@ -37,11 +38,11 @@ class Feed:
     def _close_thread_after_usage(self) -> None:
         sys.exit()
 
-    def _get_xml_feed(self, feed_url):
+    def _get_xml_feed(self, feed_url, generator_exist):
         xml_entries = feedparser.parse(feed_url).entries
         if xml_entries != []:
             return xml_entries
-        elif RSSGenerator.generator_exist():
+        elif generator_exist:
             rss_feed = RSSGenerator(feed_url).render_xml_feed()
             return feedparser.parse(rss_feed).entries
         else:
