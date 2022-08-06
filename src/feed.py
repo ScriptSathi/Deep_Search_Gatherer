@@ -121,7 +121,9 @@ class Feed:
             current_feed_is_registered = self.all_posts[0].title == self.latest_post
             if current_feed_is_registered:
                 return no_need_to_post
-            else: 
+            else:
                 return post_until_latest
+        elif int(self.feed_config['published_since']) == 0:
+            return no_need_to_post
         else:
             return add_all_post_until_time
