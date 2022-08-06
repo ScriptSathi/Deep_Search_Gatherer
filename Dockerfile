@@ -12,4 +12,4 @@ RUN apk update && \
 RUN adduser -D -u 1000 scrap2rss
 USER scrap2rss
 
-CMD rackup
+CMD rackup -o 0.0.0.0
