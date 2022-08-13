@@ -5,17 +5,15 @@ from time import sleep
 from src.feed import Feed
 from src.logger import Logger
 from src.constants import Constants
-from src.rss_gen import RSSGenerator
 
 logger = Logger.get_logger()
 
 class RSSBot:
 
-    def __init__(self, client, config) -> None:
+    def __init__(self, client, config, generator_exist) -> None:
         self.client = client
         self.config = config
-        self.generator_exist = RSSGenerator.generator_exist()
-
+        self.generator_exist = generator_exist
     async def run(self):
         await self._display_bot_game()
         while True:
@@ -24,18 +22,21 @@ class RSSBot:
     async def _start_feeds(self):
         try:
             for feed_config in self.config['feeds']:
-                latest_post_in_feed = self._read_latest_post_file(feed_config['name'])
-                channels = await self._get_current_channel(feed_config)
-                rss_manager = Feed(feed_config, channels, latest_post_in_feed, self.generator_exist)
-                thread = Thread(target=rss_manager.run, args=(self.client,))
-                thread.start()
+                if bool(feed_config['is_valid_url']):
+                    latest_post_in_feed = self._read_latest_post_file(feed_config['name'])
+                    channels = await self._get_current_channel(feed_config)
+                    rss_manager = Feed(feed_config, channels, latest_post_in_feed, self.generator_exist)
+                    thread = Thread(target=rss_manager.run, args=(self.client,))
+                    thread.start()
+                else:
+                    logger.error(f"{feed_config['url']} is not a valid url, skipping")
             await self._sleep_before_refresh()
         except Exception as e:
             logger.exception(str(e))
             logger.error(f'A network issue has occured')
             await self._sleep_before_refresh()
             await self._start_feeds()
-    
+
     async def _get_current_channel(self, feed_config):
         config_channels = str(feed_config['channels']).split(',')
         client_channels = []

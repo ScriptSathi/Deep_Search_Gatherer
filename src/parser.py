@@ -1,5 +1,4 @@
 import os, json, yaml
-from typing import List
 
 from src.constants import Constants
 from src.logger import Logger
@@ -8,14 +7,11 @@ from src.utils import Utils
 logger = Logger.get_logger()
 
 class Parser:
-    def __init__(self) -> None:
-        self.config = self._load_config()
+    def __init__(self, generator_exist) -> None:
+        self.config = self._load_config(generator_exist)
 
     def get_token(self) -> str:
         return self.config['token']
-
-    def get_feeds(self) -> List['str']:
-        return self.config['feeds']
 
     def get_config(self):
         return self.config
@@ -39,7 +35,7 @@ class Parser:
             if ".json" or ".yaml" or ".yml" in file:
                 return file
 
-    def _load_config(self) -> str:
+    def _load_config(self, generator_exist) -> str:
         config = Constants.default_config
         config_path = os.path.join(Constants.json_conf_path_dir, self._file_name())
 
@@ -61,5 +57,7 @@ class Parser:
 
             if 'youtu' in feed['url']:
                 feed['url'] = Utils.get_youtube_feed_url(feed['url'])
+
+            feed['is_valid_url'] = Utils.sanitize_check(feed, generator_exist)
 
         return config
