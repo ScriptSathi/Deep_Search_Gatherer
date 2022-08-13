@@ -1,11 +1,18 @@
 import requests
 
 from src.constants import Constants
+from src.logger import Logger
+
+logger = Logger.get_logger()
 
 class RSSGenerator:
     
     def generator_exist():
-        status_code = requests.get(Constants.api_url).status_code
+        status_code = 0
+        try:
+            status_code = requests.get(Constants.api_url).status_code
+        except:
+            logger.info("The Scrape2RSS feature is disable")
         return status_code == 200
 
     def __init__(self, url) -> None:
