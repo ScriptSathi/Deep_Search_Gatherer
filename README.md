@@ -86,15 +86,20 @@ game_displayed: Eating some RSS feeds
 }
 ```
 
-## Allow parameter
+## Allow parameters
 
 | Command | Explanation | Default value |
 |----|----| ----|
 | `token` | Your bot token, it's **mandatory** variable. | "" |
 | `feeds` | The feeds you want to be used by the bot. Each feeds in the list must be an object with at least a `url`and `channel` set. <ul><li>`name` Name of the feed (default: `feed-n°X`)<li>`url` **mandatory** Url of the feed (default: `''`)</li><li>`channel` **mandatory** Channel where to display the feed. For multiple channels for a single feed, just seperate the channels with a comma (`,`) (default: `''`)</li><li>`published_since` Maximum age of latest news to be posted (default: is the value of `published_since_default`)</li>| [] |
 | `refresh-time` | Time between refreshes of a feed, in second | 900 |
-| `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, it won't display the feed | 86400 |
+| `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, only posts published after the initialization of this bot will be sent (usefull in case you use [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)) | 86400 |
 | `gameplayed` | Change the game displayed in bot profile | "Eating some RSS feeds" |
+
+## [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)
+
+If you want to follow a website that doesn't have an RSS feed, submit the URL of the page in the `url` parameter like a normal feed.
+To be used, you need to set the [full bot project](https://github.com/ScriptSathi/Deep_Search_Gatherer)
 
 ## Youtube Feature
 
