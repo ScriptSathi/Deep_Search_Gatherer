@@ -18,7 +18,7 @@ class Feed:
         self.channels = chan
         self.generator_exist = generator_exist
         
-        all_posts = self._get_xml_feed(self.feed_config['url'])
+        all_posts = self._get_feed_data(self.feed_config['url'])
         self.news_to_publish = self._get_unsended_news(all_posts)
 
     def run(self, client) -> None:
@@ -57,31 +57,36 @@ class Feed:
     def _get_unsended_news(self, all_posts):
         news_to_publish = []
         news_to_save = news_to_publish
-
-        if self.latest_post != '':
-            for single_news in all_posts:
-                if single_news.title == self.latest_post:
-                    break
-                news_to_publish.append(single_news)
-        else:
-            if int(self.feed_config['published_since']) == 0:
-                news_to_save = [all_posts[0]]
-            else:
+        is_not_in_error = all_posts != []
+        if is_not_in_error:
+            if self.latest_post != '':
                 for single_news in all_posts:
-                    if self._is_too_old_news(single_news):
+                    if single_news.title == self.latest_post:
                         break
                     news_to_publish.append(single_news)
-        self._register_latest_post(news_to_save)
-        reversed_list_from_oldest_to_earliest = list(reversed(news_to_publish))
+            else:
+                if int(self.feed_config['published_since']) == 0:
+                    news_to_save = [all_posts[0]]
+                else:
+                    for single_news in all_posts:
+                        if self._is_too_old_news(single_news):
+                            break
+                        news_to_publish.append(single_news)
+            self._register_latest_post(news_to_save)
+            reversed_list_from_oldest_to_earliest = list(reversed(news_to_publish))
+            return reversed_list_from_oldest_to_earliest
+        return news_to_publish
 
-        return reversed_list_from_oldest_to_earliest
-
-    def _get_xml_feed(self, feed_url):
+    def _get_feed_data(self, feed_url):
         xml_entries = feedparser.parse(feed_url).entries
         if xml_entries != []:
             return xml_entries
         elif self.generator_exist:
             rss_feed = RSSGenerator(feed_url).render_xml_feed()
-            return feedparser.parse(rss_feed).entries
+            feed_parsed = feedparser.parse(rss_feed).entries
+            if feed_parsed == []:
+                logger.error(f"The RSS Generator can't generate a feed based on the URL {feed_url}")
+                self.feed_config['is_valid_url'] = False
+            return feed_parsed
         else:
             raise Exception(f"URL: {feed_url} is not a valid url")

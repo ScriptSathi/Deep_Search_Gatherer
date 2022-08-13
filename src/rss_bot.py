@@ -22,10 +22,10 @@ class RSSBot:
     async def _start_feeds(self):
         try:
             for feed_config in self.config['feeds']:
+                latest_post_in_feed = self._read_latest_post_file(feed_config['name'])
+                channels = await self._get_current_channel(feed_config)
+                rss_manager = Feed(feed_config, channels, latest_post_in_feed, self.generator_exist)
                 if bool(feed_config['is_valid_url']):
-                    latest_post_in_feed = self._read_latest_post_file(feed_config['name'])
-                    channels = await self._get_current_channel(feed_config)
-                    rss_manager = Feed(feed_config, channels, latest_post_in_feed, self.generator_exist)
                     thread = Thread(target=rss_manager.run, args=(self.client,))
                     thread.start()
                 else:
