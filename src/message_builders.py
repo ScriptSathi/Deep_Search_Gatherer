@@ -4,23 +4,115 @@ from html2text import HTML2Text
 
 from src.constants import Constants
 
-class AnswerMessageBuilder:
+class CommandMessageBuilder:
     def __init__(self, bot_id, content, author, channel, server) -> None:
         self.bot_id = bot_id
         self.author = author
         self.content = content
         self.channel = channel
         self.server = server
+        self.url_submited = ""
+        self.channel_submited = ""
 
-    def build_message(self):
-        return str(self.content)
+    def set_data_submited(self, url, channel):
+        self.url_submited = url
+        self.channel_submited = channel
 
-    def build_help_message(self):
+    def build_delete_waiting_message(self):
         description = \
+            f"<@{self.author.id}> you asked for deleting the url `{self.url_submited}`\n" +\
+            f"I'm trying to delete the feed, please wait"
+        return discord.Embed(
+            title=Constants.bot_name,
+                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                description=description,
+                color=discord.Color.orange()
+            )
+
+    def build_delete_success_message(self):
+        description = f"The feed as been correctly deleted\n"
+        return discord.Embed(
+            title=Constants.bot_name,
+                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                description=description,
+                color=discord.Color.green()
+            )\
+            .set_footer(text="Rest in Peace little feed 🪦")
+
+    def build_delete_error_message(self, **props):
+        status = 1
+        url_in_error = props.pop('url_in_error', False)
+        if url_in_error: status = 0
+        else: status = 1
+        descriptions = [
+            f"<@{self.author.id}> The submitted url `{self.url_submited}` is invalid \n",
+            f"<@{self.author.id}> There's no feed with the url: `{self.url_submited}` registered\n"
+        ]
+        return discord.Embed(
+            title=Constants.bot_name,
+                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                description=descriptions[status],
+                color=discord.Color.red()
+            )\
+            .set_footer(text=f"Try again with a valid url 🚨")
+
+    def build_add_waiting_message(self):
+        description = \
+            f"<@{self.author.id}> you asked for adding `{self.url_submited}` in the channel `{self.channel_submited}`\n" +\
+            f"I'm trying to add the feed, please wait"
+        return discord.Embed(
+            title=Constants.bot_name,
+                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                description=description,
+                color=discord.Color.orange()
+            )
+
+    def build_add_success_message(self):
+        description = f"The feed as been correctly added\n" +\
+            f"Next time there will be an article in the feed, it will be posted on the channel"
+        return discord.Embed(
+            title=Constants.bot_name,
+                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                description=description,
+                color=discord.Color.green()
+            )\
+            .set_footer(text="Now you just need to enjoy the news posted 📰")
+
+    def build_add_error_message(self, **props):
+        status = 2
+        url_in_error = props.pop('url_in_error', False)
+        channel_in_error = props.pop('channel_in_error', False)
+        if url_in_error: status = 0
+        elif channel_in_error: status = 1
+        else: status = 2
+        descriptions = [
+            f"<@{self.author.id}> an error occured with the url `{self.url_submited}` for the channel `{self.channel_submited}`\n",
+            f"<@{self.author.id}> an error occured on the submited channel `{self.channel_submited}`\n",
+            f"<@{self.author.id}> an error occured with the url `{self.url_submited}` and the channel `{self.channel_submited}`\n",
+        ]
+        footers = [
+            "url",
+            "channel id",
+            "url and channel id"
+        ]
+        return discord.Embed(
+            title=Constants.bot_name,
+                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                description=descriptions[status],
+                color=discord.Color.red()
+            )\
+            .set_footer(text=f"Try again with a valid {footers[status]} 🚨")
+
+    def build_help_message(self, is_in_error=False):
+        desc_help = \
             f"Hey <@{self.author.id}> ! You don't know me yet ?\n" +\
             f"I've been created to help you getting in touch with any websites you want !\n" +\
             f"Every time there will be a new article/video, i'll post it over discord on the channel you wanted\n" +\
             f"To help you using my services i'll tell you how i work."
+        desc_error = \
+            f"Hey <@{self.author.id}>, i miss understood your command\n" +\
+            f"I'll explain what i'm able to do\n"
+        description = desc_error if is_in_error else desc_help
 
         capabilites = \
             f"- `Add` a new feed to the list on a specific channel\n" +\
@@ -40,16 +132,7 @@ class AnswerMessageBuilder:
             .add_field(name="__Examples:__", value=examples, inline=False)\
             .set_footer(text="Made with 🧡")
 
-    def _help_array(self):
-        return [
-            
-            f"Few options are available. `Adding` a followed feed, or `deleting` a followed feed",
-            f"For adding a feed, the key word is `add` and to delete is `delete`. But to make it work you need to tag me in the message.",
-            f"Here is an example:",
-            f"```",
-            f"{self.bot_id} add=<url_to_follow> submit_on=<channel_id>"
-            f"```",
-        ]
+
 
 class NewsMessageBuilder:
     

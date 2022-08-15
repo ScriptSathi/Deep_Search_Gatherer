@@ -2,7 +2,7 @@ import feedparser, datetime, sys
 
 from dateutil import parser
 
-from src.message import Message
+from src.message import NewsMessage
 from src.utils import Utils
 from src.logger import Logger
 from src.constants import Constants
@@ -22,7 +22,7 @@ class Feed:
         self.news_to_publish = self._get_unsended_news(all_posts)
 
     def run(self, client) -> None:
-        self.message = Message(client, self.channels, self.feed_config)
+        self.message = NewsMessage(client, channels=self.channels, feed_config=self.feed_config)
         self._send_message_if_needed()
         self._close_thread()
 

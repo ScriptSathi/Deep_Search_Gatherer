@@ -1,35 +1,14 @@
-from src.message_builders import NewsMessageBuilder, AnswerMessageBuilder
+from src.message_builders import NewsMessageBuilder, CommandMessageBuilder
 from src.logger import Logger
 
 logger = Logger.get_logger()
 
 class Message:
-
-    def __init__(self, client, channels = [], feed_config = []) -> None:
+    def __init__(self, client) -> None:
         self.client = client
-        self.channels = channels
-        self.feed_config = feed_config
-
-    def send_news(self, news):
-        message = NewsMessageBuilder(news).build_message()
-        for chan in self.channels:
-            self._send_stdout(chan, news=news, is_a_news=True)
-            self._send_discord(message, chan)
-    
-    def send_answer(self, msg_content, author, chan, server):
-        bot_id = self.client.user.id
-        answer_to_user = AnswerMessageBuilder(bot_id, msg_content, author, chan, server).build_message()
-        self._send_stdout(chan, msg_content=msg_content, author=author, server=server)
-        self._send_discord(answer_to_user, chan)
-
-    def send_help(self, msg_content, author, chan, server):
-        bot_id = self.client.user.id
-        answer_to_user = AnswerMessageBuilder(bot_id, msg_content, author, chan, server).build_help_message()
-        self._send_discord(answer_to_user, chan, True)
 
     def _send_discord(self, message, channel, embed = False):
         if embed:
-            logger.info("aafaefaef")
             self.client.loop.create_task(channel.send(embed=message))
         else:
             self.client.loop.create_task(channel.send(message))
@@ -46,3 +25,61 @@ class Message:
             logger.info(f'{self.feed_config["name"]} - Publishing on channel "{channel}" - "{news.title}"')
         else:
             logger.info(f'Author: {author} from server {server} on channel {channel} - "{msg_content}"')
+
+class NewsMessage(Message):
+    def __init__(self, client, channels, feed_config) -> None:
+        super().__init__(client)
+        self.channels = channels
+        self.feed_config = feed_config
+
+    def send_news(self, news):
+        message = NewsMessageBuilder(news).build_message()
+        for chan in self.channels:
+            self._send_stdout(chan, news=news, is_a_news=True)
+            self._send_discord(message, chan)
+
+class CommandMessage(Message):
+    def __init__(self, client, author, channel, server, msg_content) -> None:
+        super().__init__(client)
+        self.msg_content = msg_content
+        self.author = author
+        self.channel = channel
+        self.server = server
+        self.builder = CommandMessageBuilder(
+            client.user.id, 
+            self.msg_content, 
+            self.author, 
+            self.channel, 
+            self.server
+        )
+
+    def send_help(self, is_in_error=False):
+        answer_to_user = self.builder.build_help_message(is_in_error)
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def send_add_waiting(self):
+        answer_to_user = self.builder.build_add_waiting_message()
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def send_add_success(self):
+        answer_to_user = self.builder.build_add_success_message()
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def send_add_error(self, **props):
+        answer_to_user = self.builder.build_add_error_message(**props)
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def send_delete_waiting(self):
+        answer_to_user = self.builder.build_delete_waiting_message()
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def send_delete_success(self):
+        answer_to_user = self.builder.build_delete_success_message()
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def send_delete_error(self, **props):
+        answer_to_user = self.builder.build_delete_error_message(**props)
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def set_data_submited(self, url_submited, channel_submited):
+        self.builder.set_data_submited(url_submited, channel_submited)
