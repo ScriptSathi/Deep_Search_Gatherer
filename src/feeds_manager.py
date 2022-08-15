@@ -9,19 +9,25 @@ logger = Logger.get_logger()
 
 class FeedsManager:
 
-    def __init__(self, client, config, generator_exist) -> None:
+    def __init__(self, client, config, parser, generator_exist) -> None:
         self.client = client
+        self.parser = parser
         self.config = config
         self.generator_exist = generator_exist
 
     async def run(self):
         await self._display_bot_game()
-        while True:
-            await self._start_feeds()
+        while "servers" in self.config and self.config['servers'] != []:
+            while True:
+                # self.config['servers'] = self.parser.load_server_config(self.generator_exist)
+                for server_config in self.config['servers']:
+                    await self._start_feeds(server_config)
+                    await self._sleep_before_refresh()
+        logger.info('No servers config set yet')
 
-    async def _start_feeds(self):
+    async def _start_feeds(self, server_config):
         try:
-            for feed_config in self.config['feeds']:
+            for feed_config in server_config['feeds']:
                 latest_post_in_feed = self._read_latest_post_file(feed_config['name'])
                 channels = await self._get_current_channel(feed_config)
                 rss_manager = Feed(feed_config, channels, latest_post_in_feed, self.generator_exist)
@@ -30,7 +36,6 @@ class FeedsManager:
                     thread.start()
                 else:
                     logger.error(f"{feed_config['url']} is not a valid url, skipping")
-            await self._sleep_before_refresh()
         except Exception as e:
             logger.exception(str(e))
             logger.error(f'A network issue has occured')

@@ -8,56 +8,94 @@ logger = Logger.get_logger()
 
 class Parser:
     def __init__(self, generator_exist) -> None:
-        self.config = self._load_config(generator_exist)
+        self._bootstrap_config(generator_exist)
+        self._generate_servers_config()
 
     def get_token(self) -> str:
         return self.config['token']
+    
+    def load_server_config(self, generator_exist, config=[]):
+        if config == []:
+            config['servers'] = self._read_and_render_server_configs()
+        for server in config["servers"]:
+            if "id" not in server:
+                server["id"] = ""
+            for feed in server["feeds"]:
+                self._build_feed(feed, generator_exist)
+        self.config['servers'] = config["servers"]
 
-    def get_config(self):
-        return self.config
+    def append_new_feed(
+        self, 
+        url_submited,
+        channel_submited, 
+        channel_name, 
+        server_to_submit,
+        generator_exist
+    ):
+        for server in self.config['servers']:
+            if server['id'] == server_to_submit:
+                feed = {
+                    "url": url_submited,
+                    "channels": channel_submited,
+                }
+                self._build_feed(feed, generator_exist, channel_name)
+                logger.info(feed)
+                server['feeds'].append(feed)
+                logger.info("---")
+                logger.info(self.config)
+                logger.info("---")
 
-    def _is_valid_config_file(self, file_path) -> bool:
+
+    def _build_feed(self, feed, generator_exist, channel_name = ''):
+        if "name" not in feed:
+            channel_name = "feed" if channel_name == "" else channel_name
+            feed["name"] = f"{channel_name}-{Utils.generate_random_string()}"
+        if "published_since" not in feed:
+            feed["published_since"] = Constants.default_config["published_since_default"]
+        if "refresh_time" not in feed:
+            feed["refresh_time"] = Constants.default_config["refresh_time"]
+        if 'youtu' in feed['url'] and "feeds" not in feed['url']:
+            feed['url'] = Utils.get_youtube_feed_url(feed['url'])
+        feed['is_valid_url'] = Utils.sanitize_check(feed['url'], generator_exist)
+
+    def _validate_config_file(self, file_path) -> bool:
+        config = []
         try:
             if os.path.isfile(file_path):
                 config_file_content = open(file_path,'r').read()
                 try:
-                    self.config = json.loads(config_file_content)
+                    config = json.loads(config_file_content)
                 except:
-                    self.config = yaml.safe_load(config_file_content)
-                return True
+                    config = yaml.safe_load(config_file_content)
+                return config, True
         except Exception:
             logger.info(f'You must submit a valid file in path: {Constants.base_conf_path_dir} file dir')
-            return False
+            return config, False
 
     def _file_name(self) -> str:
         file_list = os.listdir(Constants.base_conf_path_dir)
         for file in file_list:
-            if ".json" or ".yaml" or ".yml" in file:
+            if ".json" or ".yaml" or ".yml" in file and file != Constants.servers_conf_path:
                 return file
 
-    def _load_config(self, generator_exist) -> str:
-        config = Constants.default_config
+    def _bootstrap_config(self, generator_exist) -> str:
+        self.config = Constants.default_config
         config_path = os.path.join(Constants.base_conf_path_dir, self._file_name())
+        base_config, config_is_valid = self._validate_config_file(config_path)
+        if config_is_valid:
+            for key, value in base_config.items():
+                self.config[key] = value
+        self.load_server_config(generator_exist, self.config)
 
-        if self._is_valid_config_file(config_path):
+    def _generate_servers_config(self):
+        if "servers" in self.config:
+            yaml_text = yaml.dump({"servers": self.config["servers"]})
+            with open(Constants.servers_conf_path, 'w') as yaml_file:
+                try:
+                    yaml_file.write(yaml_text)
+                finally:
+                    yaml_file.close()
 
-            for key, value in self.config.items():
-                config[key] = value
-
-        for feed in config["feeds"]:
-            if "name" not in feed:
-                current_index = config["feeds"].index(feed)
-                feed["name"] = f"feed-{str(current_index)}"
-
-            if "published_since" not in feed:
-                feed["published_since"] = config["published_since_default"]
-            
-            if "refresh_time" not in feed:
-                feed["refresh_time"] = config["refresh_time"]
-
-            if 'youtu' in feed['url']:
-                feed['url'] = Utils.get_youtube_feed_url(feed['url'])
-
-            feed['is_valid_url'] = Utils.sanitize_check(feed, generator_exist)
-
-        return config
+    def _read_and_render_server_configs(self):
+        with open(Constants.servers_conf_path, 'r') as yaml_file:
+            return yaml.safe_load(yaml_file.readlines())['servers']

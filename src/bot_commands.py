@@ -6,8 +6,10 @@ logger = Logger.get_logger()
 
 class BotCommands:
 
-    def __init__(self, client, message) -> None:
+    def __init__(self, client, parser, message, generator_exist) -> None:
         self.client = client
+        self.parser = parser
+        self.generator_exist = generator_exist
         self.author = message.author
         self.channel = message.channel
         self.server = message.guild.id if "id" in dir(message.guild) else ""
@@ -42,6 +44,13 @@ class BotCommands:
         self.message.send_add_waiting()
         
         if url_is_valid and channel_is_valid:
+            self.parser.append_new_feed(
+                url_submited, 
+                channel_submited, 
+                channel_name, 
+                self.server,
+                self.generator_exist
+            )
             self.message.send_add_success()
         elif url_is_valid and not channel_is_valid:
             self.message.send_add_error(channel_in_error=True)

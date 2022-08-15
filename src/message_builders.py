@@ -24,7 +24,7 @@ class CommandMessageBuilder:
             f"I'm trying to delete the feed, please wait"
         return discord.Embed(
             title=Constants.bot_name,
-                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                url=Constants.source_code_url,
                 description=description,
                 color=discord.Color.orange()
             )
@@ -33,7 +33,7 @@ class CommandMessageBuilder:
         description = f"The feed as been correctly deleted\n"
         return discord.Embed(
             title=Constants.bot_name,
-                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                url=Constants.source_code_url,
                 description=description,
                 color=discord.Color.green()
             )\
@@ -50,7 +50,7 @@ class CommandMessageBuilder:
         ]
         return discord.Embed(
             title=Constants.bot_name,
-                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                url=Constants.source_code_url,
                 description=descriptions[status],
                 color=discord.Color.red()
             )\
@@ -62,7 +62,7 @@ class CommandMessageBuilder:
             f"I'm trying to add the feed, please wait"
         return discord.Embed(
             title=Constants.bot_name,
-                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                url=Constants.source_code_url,
                 description=description,
                 color=discord.Color.orange()
             )
@@ -72,7 +72,7 @@ class CommandMessageBuilder:
             f"Next time there will be an article in the feed, it will be posted on the channel"
         return discord.Embed(
             title=Constants.bot_name,
-                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                url=Constants.source_code_url,
                 description=description,
                 color=discord.Color.green()
             )\
@@ -97,7 +97,7 @@ class CommandMessageBuilder:
         ]
         return discord.Embed(
             title=Constants.bot_name,
-                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                url=Constants.source_code_url,
                 description=descriptions[status],
                 color=discord.Color.red()
             )\
@@ -124,7 +124,7 @@ class CommandMessageBuilder:
 
         return discord.Embed(
             title=Constants.bot_name,
-                url="https://github.com/ScriptSathi/discord_information_gatherer",
+                url=Constants.source_code_url,
                 description=description,
                 color=discord.Color.orange()
             )\

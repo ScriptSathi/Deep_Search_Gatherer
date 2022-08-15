@@ -1,6 +1,7 @@
-import pytz, requests, re, feedparser
+import pytz, requests, re, feedparser, random
 
 from src.logger import Logger
+from src.constants import Constants
 
 logger = Logger.get_logger()
 
@@ -27,19 +28,25 @@ class Utils:
         return str(is_include_string).upper() in string \
             or str(is_include_string).lower() in string
 
-    def sanitize_check(feed, generator_exist):
-        is_valid = False
-        try:
-            status = requests.get(feed['url'], timeout=5).status_code
-            if generator_exist:
-                is_valid = status == 200
-            else:
-                feed_data = feedparser.parse(feed['url']).entries
-                is_valid = feed_data != []
-        except:
-            logger.error(f"An error occured. No answer from host {feed['url']}. "
-                + f"Please verify if the submitted URL is valid"
-            )
+    def sanitize_check(url, generator_exist):
+        def try_to_reach():
+            is_valid = False
+            try:
+                feed_data = feedparser.parse(url).entries
+                if feed_data == [] and generator_exist:
+                    api_gen_url = Constants.api_url + "/create?url=" + url
+                    status = requests.get(api_gen_url, timeout=5).status_code
+                    is_valid = status == 200
+                elif feed_data != []:
+                    is_valid = True
+            except:
+                logger.error(f"An error occured. No answer from host {url}. "
+                    + f"Please verify if the submitted URL is valid"
+                )
+            return is_valid
+        is_valid = try_to_reach()
+        if not is_valid: # try to reach a second time
+            is_valid = try_to_reach()
         return is_valid
 
     def is_a_valid_url(url):
@@ -57,7 +64,7 @@ class Utils:
             status = requests.get(url, timeout=5).status_code
             is_valid = status == 200 and is_url_format_valid
         except:
-            logger.error(f"The submited url: {url} does not answer")
+            logger.warning(f"The submited url: {url} does not answer")
         return is_valid
 
     async def is_a_valid_channel(client, channel_submited, server_id):
@@ -69,5 +76,14 @@ class Utils:
                 is_valid = True
                 channel_name = channel_obj.name
         except:
-            logger.error(f"The submited channel: {channel_submited} is not valid")
+            logger.warning(f"The submited channel: {channel_submited} is not valid")
         return channel_name, is_valid
+    
+    def generate_random_string():
+        random_string = ""
+        for _ in range(5):
+            random_integer = random.randint(97, 97 + 26 - 1)
+            flip_bit = random.randint(0, 1)
+            random_integer = random_integer - 32 if flip_bit == 1 else random_integer
+            random_string += (chr(random_integer))
+        return random_string
