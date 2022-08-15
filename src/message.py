@@ -17,12 +17,22 @@ class Message:
             self._send_discord(message, chan)
     
     def send_answer(self, msg_content, author, chan, server):
-        answer_to_user = AnswerMessageBuilder(msg_content, author, chan, server).build_message()
+        bot_id = self.client.user.id
+        answer_to_user = AnswerMessageBuilder(bot_id, msg_content, author, chan, server).build_message()
         self._send_stdout(chan, msg_content=msg_content, author=author, server=server)
         self._send_discord(answer_to_user, chan)
 
-    def _send_discord(self, message, channel):
-        self.client.loop.create_task(channel.send(message))
+    def send_help(self, msg_content, author, chan, server):
+        bot_id = self.client.user.id
+        answer_to_user = AnswerMessageBuilder(bot_id, msg_content, author, chan, server).build_help_message()
+        self._send_discord(answer_to_user, chan, True)
+
+    def _send_discord(self, message, channel, embed = False):
+        if embed:
+            logger.info("aafaefaef")
+            self.client.loop.create_task(channel.send(embed=message))
+        else:
+            self.client.loop.create_task(channel.send(message))
 
     def _send_stdout(self, channel, **options):
         is_a_news = options.pop('is_a_news', False)

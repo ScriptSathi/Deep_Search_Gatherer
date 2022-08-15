@@ -14,7 +14,7 @@ class BotCommands:
         self.message = Message(self.client)
         
     def do_smth(self):
-        self.message.send_answer(
+        self.message.send_help(
             self.msg_content, 
             self.author, 
             self.channel, 
