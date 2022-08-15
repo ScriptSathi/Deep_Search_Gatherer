@@ -19,8 +19,8 @@ class FeedsManager:
         await self._display_bot_game()
         while "servers" in self.config and self.config['servers'] != []:
             while True:
-                # self.config['servers'] = self.parser.load_server_config(self.generator_exist)
                 for server_config in self.config['servers']:
+                    self.parser.create_backup_servers_config()
                     await self._start_feeds(server_config)
                     await self._sleep_before_refresh()
         logger.info('No servers config set yet')

@@ -25,7 +25,7 @@ class Bot(discord.Client):
         await FeedsManager(self, self.config, self.parser, self.generator_exist).run()
 
     async def on_message(self, message):
-        if message.author.id != self.user.id and str(self.user.id) in message.content and message.guild.id == 989551673200504833:
+        if message.author.id != self.user.id and self.user.mentioned_in(message):
             await BotCommands(self, self.parser, message, self.generator_exist).handle_messages()
 
 if __name__ == "__main__":

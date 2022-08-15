@@ -44,14 +44,17 @@ class BotCommands:
         self.message.send_add_waiting()
         
         if url_is_valid and channel_is_valid:
-            self.parser.append_new_feed(
-                url_submited, 
-                channel_submited, 
-                channel_name, 
-                self.server,
-                self.generator_exist
-            )
-            self.message.send_add_success()
+            try:
+                self.parser.append_new_feed(
+                    url_submited, 
+                    channel_submited, 
+                    channel_name, 
+                    self.server,
+                    self.generator_exist
+                )
+                self.message.send_add_success()
+            except:
+                self.message.send_add_error(url_in_error=True)
         elif url_is_valid and not channel_is_valid:
             self.message.send_add_error(channel_in_error=True)
         elif not url_is_valid and channel_is_valid:
