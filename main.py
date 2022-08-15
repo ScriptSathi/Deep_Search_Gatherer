@@ -24,8 +24,8 @@ class Bot(discord.Client):
         await FeedsManager(self, self.config, self.generator_exist).run()
 
     async def on_message(self, message):
-        if message.author.id != self.user.id:
-            BotCommands(self, message).do_smth()
+        if message.author.id != self.user.id and str(self.user.id) in message.content:
+            await BotCommands(self, message).handle_messages()
 
 if __name__ == "__main__":
     generator_exist = RSSGenerator.generator_exist()
