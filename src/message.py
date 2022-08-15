@@ -1,74 +1,38 @@
-import re
-
-from html2text import HTML2Text
-
+from src.message_builders import NewsMessageBuilder, AnswerMessageBuilder
 from src.logger import Logger
 
 logger = Logger.get_logger()
 
 class Message:
 
-    def parse_html(html_content): 
-        htmlfixer = HTML2Text()
-        htmlfixer.ignore_links = True
-        htmlfixer.ignore_images = True
-        htmlfixer.ignore_emphasis = False
-        htmlfixer.body_width = 1000
-        htmlfixer.unicode_snob = True
-        htmlfixer.ul_item_mark = "-" 
-        markdownfield = htmlfixer.handle(html_content)
-        return re.sub("<[^<]+?>", "", markdownfield)
-
-    def render_author(news):
-        if 'authors' or 'author' in news:
-            if 'authors' in news:
-                if news['authors'][0] == {}:
-                    return "Unknow authors"
-                else:
-                    str_authors = 'Author: '
-                    if len(news['authors']) == 1:
-                        str_authors += (news['authors'][0]).name
-                    else:
-                        for author in news['authors']:
-                            str_authors += author.name + ', '
-                    return str_authors
-            elif 'author' in news:
-                return "Unknow author" if news['author'] == {} else news['author'].name
-        return ''
-
-    def is_youtube_feed(news):
-        return 'yt_videoid' in news
-
-    def __init__(self, client, channels, feed_config) -> None:
+    def __init__(self, client, channels = [], feed_config = []) -> None:
         self.client = client
         self.channels = channels
         self.feed_config = feed_config
 
-    def send_message(self, news):
-        message = self._build_message(news)
+    def send_news(self, news):
+        message = NewsMessageBuilder(news).build_message()
         for chan in self.channels:
-            self._send_stdout(news, chan)
+            self._send_stdout(chan, news=news, is_a_news=True)
             self._send_discord(message, chan)
+    
+    def send_answer(self, msg_content, author, chan, server):
+        answer_to_user = AnswerMessageBuilder(msg_content, author, chan, server).build_message()
+        self._send_stdout(chan, msg_content=msg_content, author=author, server=server)
+        self._send_discord(answer_to_user, chan)
 
     def _send_discord(self, message, channel):
         self.client.loop.create_task(channel.send(message))
 
-    def _send_stdout(self, news, channel):
-        logger.info(f'{self.feed_config["name"]} - Publishing on channel "{channel.name}" - "{news.title}"')
+    def _send_stdout(self, channel, **options):
+        is_a_news = options.pop('is_a_news', False)
+        news = options.pop('news', '')
+        msg_content = options.pop('msg_content', '')
+        server = options.pop('server', '')
+        author = options.pop('author', '')
+        channel = channel.name if "name" in dir(channel) else channel
 
-    def _build_message(self, news):
-
-        auth = Message.render_author(news)
-        message = ''
-
-        title = f'***{news.title}***'
-        author = f'*{auth}*' if auth != '' else ''
-        # published = news.published if not Message.is_youtube_feed(news) else ''
-        link = news.link
-        summary = Message.parse_html(news.summary) if not Message.is_youtube_feed(news) else ''
-
-        for field in (title, author, link, summary):
-            if field != '' :
-                message += field + '\n'                
-
-        return message
+        if is_a_news:
+            logger.info(f'{self.feed_config["name"]} - Publishing on channel "{channel}" - "{news.title}"')
+        else:
+            logger.info(f'Author: {author} from server {server} on channel {channel} - "{msg_content}"')

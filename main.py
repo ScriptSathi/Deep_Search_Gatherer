@@ -1,13 +1,13 @@
 import discord
-
 from src.logger import Logger
 from src.parser import Parser
 from src.rss_gen import RSSGenerator
-from src.rss_bot import RSSBot
+from src.feeds_manager import FeedsManager
+from src.bot_commands import BotCommands
 
 logger = Logger.get_logger()
 
-class Client(discord.Client):
+class Bot(discord.Client):
 
     def __init__(self, generator_exist, **discord_params) -> None:
         super().__init__(**discord_params)
@@ -21,7 +21,11 @@ class Client(discord.Client):
 
     async def _prepare_and_run(self):
         await self.wait_until_ready()
-        await RSSBot(self, self.config, self.generator_exist).run()
+        await FeedsManager(self, self.config, self.generator_exist).run()
+
+    async def on_message(self, message):
+        if message.author.id != self.user.id:
+            BotCommands(self, message).do_smth()
 
 if __name__ == "__main__":
     generator_exist = RSSGenerator.generator_exist()
@@ -29,7 +33,7 @@ if __name__ == "__main__":
     config = parser.get_config()
     token = parser.get_token()
 
-    Client(
+    Bot(
         generator_exist,
         chunk_guilds_at_startup=False,
         member_cache_flags=discord.MemberCacheFlags.none(),

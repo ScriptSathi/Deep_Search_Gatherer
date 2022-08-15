@@ -44,7 +44,7 @@ class Feed:
 
     def _post_news_on_discord(self, news_to_publish) -> None:
         for new_post in news_to_publish:
-            self.message.send_message(new_post)
+            self.message.send_news(new_post)
 
     def _is_too_old_news(self, single_news):
         date_time = parser.parse(single_news['published'])
