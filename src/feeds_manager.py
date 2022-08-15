@@ -1,6 +1,5 @@
-import discord, functools, os, json, asyncio
+import discord, os, asyncio
 from threading import Thread
-from time import sleep
 
 from src.feed import Feed
 from src.logger import Logger
@@ -8,12 +7,13 @@ from src.constants import Constants
 
 logger = Logger.get_logger()
 
-class RSSBot:
+class FeedsManager:
 
     def __init__(self, client, config, generator_exist) -> None:
         self.client = client
         self.config = config
         self.generator_exist = generator_exist
+
     async def run(self):
         await self._display_bot_game()
         while True:
