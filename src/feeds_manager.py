@@ -17,16 +17,21 @@ class FeedsManager:
 
     async def run(self):
         await self._display_bot_game()
-        while "servers" in self.config and self.config['servers'] != []:
-            while True:
-                for server_config in self.config['servers']:
-                    if server_config["feeds"] != []:
-                        await self._start_feeds(server_config)
-                    else:
-                        logger.info(f"The server {server_config['id']} as no feeds set, skipping")
-                self.parser.create_backup_servers_config()
-                await self._sleep_before_refresh()
-        logger.info('No servers config set yet')
+        while True:
+            if "servers" in self.config and self.config['servers'] != []:
+                while True:
+                    for server_config in self.config['servers']:
+                        if server_config["feeds"] != []:
+                            await self._start_feeds(server_config)
+                        else:
+                            logger.info(f"The server {server_config['id']} as no feeds set, skipping")
+                    self.parser.create_backup_servers_config()
+                    await self._sleep_before_refresh()
+            else:
+                logger.info('No servers config set yet')
+                await self._sleep_before_refresh(10)
+                await self.run()
+
 
     async def _start_feeds(self, server_config):
         try:
@@ -56,7 +61,7 @@ class FeedsManager:
         game_displayed = self.config['game_displayed']
         await self.client.change_presence(activity=discord.Game(name=game_displayed))
 
-    async def _sleep_before_refresh(self) -> None:
-        refresh_time = self.config['refresh_time']
+    async def _sleep_before_refresh(self, time_to_sleep = 0) -> None:
+        refresh_time = time_to_sleep if time_to_sleep != 0 else self.config['refresh_time']
         logger.info(f'Sleep for {refresh_time}s before the next refresh')
         await asyncio.sleep(refresh_time)

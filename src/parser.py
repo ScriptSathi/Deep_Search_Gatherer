@@ -51,11 +51,15 @@ class Parser:
     def create_backup_servers_config(self):
         if "servers" in self.config:
             yaml_text = yaml.dump({"servers": self.config["servers"]})
-            with open(Constants.servers_conf_path, 'w') as yaml_file:
-                try:
-                    yaml_file.write(yaml_text)
-                finally:
-                    yaml_file.close()
+            try:
+                with open(Constants.backup_path, 'w') as yaml_file:
+                    try:
+                        yaml_file.write(yaml_text)
+                    finally:
+                        yaml_file.close()
+            except:
+                os.mkdir(Constants.backup_dir_path)
+                self.create_backup_servers_config()
 
     def delete_from_config(self, field_name_to_remove, field_value_to_remove, server_id):
         feed_is_removed = False
@@ -105,7 +109,7 @@ class Parser:
     def _file_name(self) -> str:
         file_list = os.listdir(Constants.base_conf_path_dir)
         for file in file_list:
-            if ".json" or ".yaml" or ".yml" in file and file != Constants.servers_conf_path:
+            if ".json" or ".yaml" or ".yml" in file and file != Constants.backup_path:
                 return file
 
     def _load_server_config(self, generator_exist, servers_config=[]):
@@ -119,7 +123,7 @@ class Parser:
 
     def _read_backup_servers_config(self, servers_config):
         try:
-            with open(Constants.servers_conf_path, 'r') as yaml_file:
+            with open(Constants.backup_path, 'r') as yaml_file:
                 logger.info('Backup loaded successfully')
                 return yaml.safe_load(yaml_file)['servers']
         except:

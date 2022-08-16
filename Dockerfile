@@ -1,7 +1,9 @@
 FROM python:3.9.13-alpine3.16
 
 # Create user feedbot for security purpose and switch to it
-RUN adduser -D -u 1000 rssbot
+RUN adduser -D -u 1000 rssbot && \
+	mkdir -p /config/backups && \
+	chown rssbot /config
 USER rssbot
 WORKDIR /home/rssbot
 
