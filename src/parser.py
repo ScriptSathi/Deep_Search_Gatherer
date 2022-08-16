@@ -1,3 +1,4 @@
+from cmath import exp
 import os, json, yaml
 
 from src.constants import Constants
@@ -12,6 +13,11 @@ class Parser:
 
     def get_token(self) -> str:
         return self.config['token']
+    
+    def get_server_config(self, server_id):
+        for server in self.config['servers']:
+            if server_id == server['id']:
+                return server
 
     def append_new_feed(
         self,
@@ -19,11 +25,13 @@ class Parser:
         channel_submited,
         channel_name,
         server_to_submit,
-        generator_exist
+        generator_exist,
+        name_submited
     ):
         feed = {
             "url": url_submited,
             "channel": channel_submited,
+            "name": name_submited
         }
         self._build_feed(feed, generator_exist, channel_name)
         if self._is_server_already_registered(server_to_submit):
@@ -49,11 +57,15 @@ class Parser:
                     yaml_file.close()
 
     def delete_from_config(self, field_name_to_remove, field_value_to_remove, server_id):
+        feed_is_removed = False
         for server in self.config['servers']:
             if server['id'] == server_id:
                 for feed in server['feeds']:
                     if feed[field_name_to_remove] == field_value_to_remove:
                         server['feeds'].remove(feed)
+                        feed_is_removed = True
+        if not feed_is_removed:
+            raise # for trigger Message.send_delete_error()
         logger.info(f"Successfully deleting {field_name_to_remove} from server {server_id}")
 
     def _bootstrap_config(self, generator_exist) -> str:
@@ -63,10 +75,10 @@ class Parser:
         if config_is_valid:
             for key, value in base_config.items():
                 self.config[key] = value
-        self.load_server_config(generator_exist, self.config['servers'])
+        self._load_server_config(generator_exist, self.config['servers'])
 
     def _build_feed(self, feed, generator_exist, channel_name = ''):
-        if "name" not in feed:
+        if "name" not in feed or feed['name'] == '':
             channel_name = "feed" if channel_name == "" else channel_name
             feed["name"] = f"{channel_name}-{Utils.generate_random_string()}"
         if "published_since" not in feed:
@@ -95,7 +107,7 @@ class Parser:
             if ".json" or ".yaml" or ".yml" in file and file != Constants.servers_conf_path:
                 return file
 
-    def load_server_config(self, generator_exist, servers_config=[]):
+    def _load_server_config(self, generator_exist, servers_config=[]):
         servers_config = self._read_backup_servers_config(servers_config)
         for server in servers_config:
             if "id" not in server:

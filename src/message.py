@@ -38,22 +38,26 @@ class NewsMessage(Message):
         self._send_discord(message, self.channel)
 
 class CommandMessage(Message):
-    def __init__(self, client, author, channel, server, msg_content) -> None:
+    def __init__(self, client, author, channel, msg_content, server_name) -> None:
         super().__init__(client)
         self.msg_content = msg_content
         self.author = author
         self.channel = channel
-        self.server = server
+        self.server_name = server_name
         self.builder = CommandMessageBuilder(
             client.user.id, 
             self.msg_content, 
             self.author, 
             self.channel, 
-            self.server
+            self.server_name
         )
 
     def send_help(self, is_in_error=False):
         answer_to_user = self.builder.build_help_message(is_in_error)
+        self._send_discord(answer_to_user, self.channel, True)
+
+    def send_feeds_list(self, server_name, server_config):
+        answer_to_user = self.builder.build_feeds_list_message(server_name, server_config)
         self._send_discord(answer_to_user, self.channel, True)
 
     def send_add_waiting(self):

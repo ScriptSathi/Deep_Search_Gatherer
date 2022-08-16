@@ -1,4 +1,5 @@
 import re, discord
+from src.utils import Utils
 
 from html2text import HTML2Text
 
@@ -10,7 +11,7 @@ class CommandMessageBuilder:
         self.author = author
         self.content = content
         self.channel = channel
-        self.server = server
+        self.server_id = server
         self.url_submited = ""
         self.channel_submited = ""
         self.feed_name_submited = ""
@@ -22,7 +23,7 @@ class CommandMessageBuilder:
 
     def build_delete_waiting_message(self):
         description = \
-            f"<@{self.author.id}> you asked for deleting the feed `{self.feed_name_submited}`\n" +\
+            f"<@{self.author.id}> you asked for deleting `{self.feed_name_submited}`\n" +\
             f"I'm trying to delete the feed, please wait"
         return discord.Embed(
             title=Constants.bot_name,
@@ -43,12 +44,12 @@ class CommandMessageBuilder:
 
     def build_delete_error_message(self, **props):
         status = 1
-        url_in_error = props.pop('url_in_error', False)
-        if url_in_error: status = 0
+        name_in_error = props.pop('url_in_error', False)
+        if name_in_error: status = 0
         else: status = 1
         descriptions = [
-            f"<@{self.author.id}> The submitted url `{self.url_submited}` is invalid \n",
-            f"<@{self.author.id}> There's no feed with the url: `{self.url_submited}` registered\n"
+            f"<@{self.author.id}> The submitted name `{self.feed_name_submited}` is invalid \n",
+            f"<@{self.author.id}> There's no feed named: `{self.feed_name_submited}` registered\n"
         ]
         return discord.Embed(
             title=Constants.bot_name,
@@ -56,7 +57,7 @@ class CommandMessageBuilder:
                 description=descriptions[status],
                 color=discord.Color.red()
             )\
-            .set_footer(text=f"Try again with a valid url 🚨")
+            .set_footer(text=f"Try again with a registered feed 🚨")
 
     def build_add_waiting_message(self):
         description = \
@@ -133,6 +134,31 @@ class CommandMessageBuilder:
             .add_field(name="__Capabilites:__", value=capabilites, inline=False)\
             .add_field(name="__Examples:__", value=examples, inline=False)\
             .set_footer(text="Made with 🧡")
+    
+    def build_feeds_list_message(self, server_name, server_config):
+        description = \
+            f"Here is the list of all the feeds registered on the server `{server_name}`\n"
+        feed_list = CommandBuilderUtils.get_feed_list_message(server_config)
+        return discord.Embed(
+            title=Constants.bot_name,
+                url=Constants.source_code_url,
+                description=description,
+                color=discord.Color.orange()
+            )\
+            .add_field(name="__Feeds:__", value=feed_list, inline=False)\
+
+class CommandBuilderUtils:
+    def get_feed_list_message(server_config):
+        feeds_list = ""
+        for i, feed in enumerate(server_config['feeds']):
+            feed_url = feed['url']
+            if Utils.is_youtube_url(feed_url):
+                feed_url = Utils.get_youtube_channel_url(feed['url'])
+            feeds_list += f"**- Name: `{feed['name']}` with url: {feed_url}**"
+            if i <  len(server_config['feeds']) - 1:
+                feeds_list += "\n"
+        return feeds_list
+
 
 class NewsMessageBuilder:
     

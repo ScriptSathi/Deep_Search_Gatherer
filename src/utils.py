@@ -20,13 +20,24 @@ class Utils:
         html_content = requests.get(url, cookies=consent_cookie).text
         line_str = re.findall(r"channel_id=([A-Za-z0-9\-\_]+)", html_content)
         return f'https://www.youtube.com/feeds/videos.xml?channel_id={line_str[0]}'
+    
+    def get_youtube_channel_url(feed_url):
+        return feedparser.parse(feed_url).feed['link']
 
     def is_youtube_url(url) -> bool:
         return 'youtu' in url
 
-    def is_include_in_string(is_include_string, string):
-        return str(is_include_string).upper() in string \
-            or str(is_include_string).lower() in string
+    def is_include_in_string(include_to_test, string):
+        if isinstance(include_to_test, str) or isinstance(include_to_test, int):
+            return str(include_to_test).upper() in string \
+                or str(include_to_test).lower() in string
+        else:
+            is_include = False
+            for to_test_str in include_to_test:
+                if str(to_test_str).upper() in string \
+                    or str(to_test_str).lower() in string:
+                    is_include = True
+            return is_include
 
     def _message_is_empty(message_txt):
         msg = message_txt.split()
