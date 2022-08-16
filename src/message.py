@@ -27,16 +27,15 @@ class Message:
             logger.info(f'Author: {author} from server {server} on channel {channel} - "{msg_content}"')
 
 class NewsMessage(Message):
-    def __init__(self, client, channels, feed_config) -> None:
+    def __init__(self, client, channel, feed_config) -> None:
         super().__init__(client)
-        self.channels = channels
+        self.channel = channel
         self.feed_config = feed_config
 
     def send_news(self, news):
         message = NewsMessageBuilder(news).build_message()
-        for chan in self.channels:
-            self._send_stdout(chan, news=news, is_a_news=True)
-            self._send_discord(message, chan)
+        self._send_stdout(self.channel, news=news, is_a_news=True)
+        self._send_discord(message, self.channel)
 
 class CommandMessage(Message):
     def __init__(self, client, author, channel, server, msg_content) -> None:

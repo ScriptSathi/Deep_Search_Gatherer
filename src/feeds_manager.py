@@ -20,36 +20,37 @@ class FeedsManager:
         while "servers" in self.config and self.config['servers'] != []:
             while True:
                 for server_config in self.config['servers']:
-                    self.parser.create_backup_servers_config()
-                    await self._start_feeds(server_config)
-                    await self._sleep_before_refresh()
+                    if server_config["feeds"] != []:
+                        await self._start_feeds(server_config)
+                    else:
+                        logger.info(f"The server {server_config['id']} as no feeds set, skipping")
+                self.parser.create_backup_servers_config()
+                await self._sleep_before_refresh()
         logger.info('No servers config set yet')
 
     async def _start_feeds(self, server_config):
         try:
             for feed_config in server_config['feeds']:
                 latest_post_in_feed = self._read_latest_post_file(feed_config['name'])
-                channels = await self._get_current_channel(feed_config)
-                rss_manager = Feed(feed_config, channels, latest_post_in_feed, self.generator_exist)
+                channel = await self._get_current_channel(feed_config)
+                rss_manager = Feed(feed_config, channel, latest_post_in_feed, self.generator_exist)
                 if bool(feed_config['is_valid_url']):
                     thread = Thread(target=rss_manager.run, args=(self.client,))
                     thread.start()
                 else:
                     logger.error(f"{feed_config['url']} is not a valid url, skipping")
         except Exception as e:
-            logger.exception(str(e))
-            logger.error(f'A network issue has occured')
-            await self._sleep_before_refresh()
-            await self._start_feeds()
+            if ("Unknown Channel" in str(e)):
+                self.parser.delete_channel_from_config(feed_config['channel'], server_config['id'])
+                logger.info(f"Channel {feed_config['channel']} does not exist. Deleting from config")
+            else:
+                logger.exception(str(e))
+                logger.error(f'A network issue has occured')
+                await self._sleep_before_refresh()
+            await self._start_feeds(server_config)
 
     async def _get_current_channel(self, feed_config):
-        config_channels = str(feed_config['channels']).split(',')
-        client_channels = []
-
-        for chan in config_channels:
-            channel_obj = await self.client.fetch_channel(chan)
-            client_channels.append(channel_obj)
-        return client_channels
+        return await self.client.fetch_channel(str(feed_config['channel']))
 
     async def _display_bot_game(self):
         game_displayed = self.config['game_displayed']

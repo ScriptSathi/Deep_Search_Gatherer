@@ -23,7 +23,7 @@ class Parser:
     ):
         feed = {
             "url": url_submited,
-            "channels": channel_submited,
+            "channel": channel_submited,
         }
         self._build_feed(feed, generator_exist, channel_name)
         if self._is_server_already_registered(server_to_submit):
@@ -37,7 +37,6 @@ class Parser:
             }
             logger.info(f"Adding server: {server_to_submit} in the config")
             self.config['servers'].append(new_server)
-            logger.info(self.config['servers'])
 
     def create_backup_servers_config(self):
         if "servers" in self.config:
@@ -47,6 +46,13 @@ class Parser:
                     yaml_file.write(yaml_text)
                 finally:
                     yaml_file.close()
+    
+    def delete_channel_from_config(self, channel_id, server_id):
+        for server in self.config['servers']:
+            if server['id'] == server_id:
+                for feed in server['feeds']:
+                    if feed['channel'] == channel_id:
+                        server['feeds'].remove(feed)
 
     def _bootstrap_config(self, generator_exist) -> str:
         self.config = Constants.default_config
@@ -56,7 +62,6 @@ class Parser:
             for key, value in base_config.items():
                 self.config[key] = value
         self.load_server_config(generator_exist, self.config['servers'])
-        logger.info(self.config)
 
     def _build_feed(self, feed, generator_exist, channel_name = ''):
         if "name" not in feed:

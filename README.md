@@ -1,5 +1,8 @@
 # [Youtube and RSS discord bot](https://github.com/ScriptSathi/discord_rss)
 
+
+***UNDER MAINTAINANCE FOR BIG REFORGE, THE DOC BELLOW IS NOT UP TO DATE***
+
 ## Introduction 
 
 This bot is used to follow a RSS feed or a youtube channel and post it over discord channels

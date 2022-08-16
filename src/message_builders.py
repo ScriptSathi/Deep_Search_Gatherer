@@ -119,8 +119,8 @@ class CommandMessageBuilder:
             f"- `Delete` a feed from the list on the current server"
 
         examples = \
-            f"> **<@{self.bot_id}> add=<url_to_follow> submit_on=<channel_id>**\n" +\
-            f"> **<@{self.bot_id}> delete=<url_to_delete>**"
+            f"> **<@{self.bot_id}> add <url_to_follow> channel <channel_id>**\n" +\
+            f"> **<@{self.bot_id}> delete <url_to_delete>**"
 
         return discord.Embed(
             title=Constants.bot_name,
@@ -131,8 +131,6 @@ class CommandMessageBuilder:
             .add_field(name="__Capabilites:__", value=capabilites, inline=False)\
             .add_field(name="__Examples:__", value=examples, inline=False)\
             .set_footer(text="Made with 🧡")
-
-
 
 class NewsMessageBuilder:
     

@@ -28,6 +28,12 @@ class Utils:
         return str(is_include_string).upper() in string \
             or str(is_include_string).lower() in string
 
+    def _message_is_empty(message_txt):
+        msg = message_txt.split()
+        if len(msg) == 1:
+            return True
+        return False
+
     def sanitize_check(url, generator_exist):
         def try_to_reach():
             is_valid = False
@@ -60,11 +66,12 @@ class Utils:
             r'(?:/?|[/?]\S+)$', re.IGNORECASE
         )
         is_url_format_valid = re.match(regexp, url) is not None
-        try:
-            status = requests.get(url, timeout=5).status_code
-            is_valid = status == 200 and is_url_format_valid
-        except:
-            logger.warning(f"The submited url: {url} does not answer")
+        if is_url_format_valid:
+            try:
+                status = requests.get(url, timeout=5).status_code
+                is_valid = status == 200 and is_url_format_valid
+            except:
+                logger.warning(f"The submited url: {url} does not answer")
         return is_valid
 
     async def is_a_valid_channel(client, channel_submited, server_id):

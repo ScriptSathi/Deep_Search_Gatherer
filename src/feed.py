@@ -15,14 +15,14 @@ class Feed:
     def __init__(self, feed_config, chan, latest_post, generator_exist = False) -> None:
         self.latest_post = latest_post
         self.feed_config = feed_config
-        self.channels = chan
+        self.channel = chan
         self.generator_exist = generator_exist
         
         all_posts = self._get_feed_data(self.feed_config['url'])
         self.news_to_publish = self._get_unsended_news(all_posts)
 
     def run(self, client) -> None:
-        self.message = NewsMessage(client, channels=self.channels, feed_config=self.feed_config)
+        self.message = NewsMessage(client, channel=self.channel, feed_config=self.feed_config)
         self._send_message_if_needed()
         self._close_thread()
 

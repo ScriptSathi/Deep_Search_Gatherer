@@ -22,7 +22,8 @@ class BotCommands:
         )
 
     async def handle_messages(self):
-        help_triggered = Utils.is_include_in_string("help", self.msg_content)
+        help_triggered = Utils._message_is_empty(self.msg_content) \
+            or Utils.is_include_in_string("help", self.msg_content)
         add_triggered = Utils.is_include_in_string("add", self.msg_content)
         delete_triggered = Utils.is_include_in_string("delete", self.msg_content)
 
@@ -30,10 +31,10 @@ class BotCommands:
             await self._handle_adding_feed()
         elif delete_triggered:
             await self._handle_deletion_feed()
-        elif not help_triggered:
-            self.message.send_help(is_in_error=True)
-        else:
+        elif help_triggered:
             self.message.send_help()
+        else:
+            self.message.send_help(is_in_error=True)
 
     async def _handle_adding_feed(self):
         url_submited, channel_submited = self._get_message_data()
@@ -77,16 +78,11 @@ class BotCommands:
         url_submited = ""
         channel_submited = ""
         array_string = self.msg_content.split()
-        for elem in array_string:
+        user_cmd = list(filter(None, array_string))
+        for i, elem in enumerate(user_cmd):
             if Utils.is_include_in_string("add", elem) \
                 or Utils.is_include_in_string("delete", elem):
-                try:
-                    url_submited = elem.split('=')[1]
-                except:
-                    url_submited = ""
+                url_submited = user_cmd[i+1]
             elif "channel" in elem:
-                try:
-                    channel_submited = elem.split('=')[1]
-                except:
-                    channel_submited = ""
+                channel_submited = user_cmd[i+1]
         return url_submited, channel_submited
