@@ -46,7 +46,10 @@ class BotCommands:
 
     def _handle_feeds_list(self):
         server_config = self.parser.get_server_config(self.server.id)
-        self.message.send_feeds_list(self.server.name, server_config)
+        if server_config == []:
+            self.message.send_feeds_list_empty(self.server.name)
+        else:
+            self.message.send_feeds_list(self.server.name, server_config)
 
     async def _handle_adding_feed(self, url_submited, channel_submited, name_submited):
         url_is_valid = Utils.is_a_valid_url(url_submited)

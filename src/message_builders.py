@@ -134,7 +134,7 @@ class CommandMessageBuilder:
             .add_field(name="__Capabilites:__", value=capabilites, inline=False)\
             .add_field(name="__Examples:__", value=examples, inline=False)\
             .set_footer(text="Made with 🧡")
-    
+
     def build_feeds_list_message(self, server_name, server_config):
         description = \
             f"Here is the list of all the feeds registered on the server `{server_name}`\n"
@@ -145,7 +145,18 @@ class CommandMessageBuilder:
                 description=description,
                 color=discord.Color.orange()
             )\
-            .add_field(name="__Feeds:__", value=feed_list, inline=False)\
+            .add_field(name="__Feeds:__", value=feed_list, inline=False)
+
+    def build_feeds_list_empty_message(self, server_name):
+        description = \
+            f"There is no feeds registered in the server `{server_name}` yet\n"
+        return discord.Embed(
+            title=Constants.bot_name,
+                url=Constants.source_code_url,
+                description=description,
+                color=discord.Color.orange()
+            )\
+            .set_footer(text="Register first a feed, if you don't how to do, try the `help` command")
 
 class CommandBuilderUtils:
     def get_feed_list_message(server_config):

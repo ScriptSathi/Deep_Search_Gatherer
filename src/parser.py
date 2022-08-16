@@ -18,6 +18,7 @@ class Parser:
         for server in self.config['servers']:
             if server_id == server['id']:
                 return server
+        return []
 
     def append_new_feed(
         self,

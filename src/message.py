@@ -60,6 +60,10 @@ class CommandMessage(Message):
         answer_to_user = self.builder.build_feeds_list_message(server_name, server_config)
         self._send_discord(answer_to_user, self.channel, True)
 
+    def send_feeds_list_empty(self, server_name):
+        answer_to_user = self.builder.build_feeds_list_empty_message(server_name)
+        self._send_discord(answer_to_user, self.channel, True)
+
     def send_add_waiting(self):
         answer_to_user = self.builder.build_add_waiting_message()
         self._send_discord(answer_to_user, self.channel, True)
