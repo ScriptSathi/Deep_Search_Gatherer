@@ -14,10 +14,10 @@ class Parser:
         return self.config['token']
 
     def append_new_feed(
-        self, 
+        self,
         url_submited,
-        channel_submited, 
-        channel_name, 
+        channel_submited,
+        channel_name,
         server_to_submit,
         generator_exist
     ):
@@ -37,6 +37,7 @@ class Parser:
             }
             logger.info(f"Adding server: {server_to_submit} in the config")
             self.config['servers'].append(new_server)
+        return feed['name']
 
     def create_backup_servers_config(self):
         if "servers" in self.config:
@@ -46,13 +47,14 @@ class Parser:
                     yaml_file.write(yaml_text)
                 finally:
                     yaml_file.close()
-    
-    def delete_channel_from_config(self, channel_id, server_id):
+
+    def delete_from_config(self, field_name_to_remove, field_value_to_remove, server_id):
         for server in self.config['servers']:
             if server['id'] == server_id:
                 for feed in server['feeds']:
-                    if feed['channel'] == channel_id:
+                    if feed[field_name_to_remove] == field_value_to_remove:
                         server['feeds'].remove(feed)
+        logger.info(f"Successfully deleting {field_name_to_remove} from server {server_id}")
 
     def _bootstrap_config(self, generator_exist) -> str:
         self.config = Constants.default_config

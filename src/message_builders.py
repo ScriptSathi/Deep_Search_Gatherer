@@ -13,14 +13,16 @@ class CommandMessageBuilder:
         self.server = server
         self.url_submited = ""
         self.channel_submited = ""
+        self.feed_name_submited = ""
 
-    def set_data_submited(self, url, channel):
-        self.url_submited = url
-        self.channel_submited = channel
+    def set_data_submited(self, **options):
+        self.url_submited = options.pop('url', '')
+        self.channel_submited = options.pop('channel', '')
+        self.feed_name_submited = options.pop('feed_name', '')
 
     def build_delete_waiting_message(self):
         description = \
-            f"<@{self.author.id}> you asked for deleting the url `{self.url_submited}`\n" +\
+            f"<@{self.author.id}> you asked for deleting the feed `{self.feed_name_submited}`\n" +\
             f"I'm trying to delete the feed, please wait"
         return discord.Embed(
             title=Constants.bot_name,
@@ -67,8 +69,8 @@ class CommandMessageBuilder:
                 color=discord.Color.orange()
             )
 
-    def build_add_success_message(self):
-        description = f"The feed as been correctly added\n" +\
+    def build_add_success_message(self, feed_name):
+        description = f"The feed as been correctly added with name `{feed_name}`\n" +\
             f"Next time there will be an article in the feed, it will be posted on the channel"
         return discord.Embed(
             title=Constants.bot_name,
@@ -138,20 +140,16 @@ class NewsMessageBuilder:
         self.single_news = single_news
     
     def build_message(self):
-
         auth = self._render_author()
         message = ''
-
         title = f'***{self.single_news.title}***'
         author = f'*{auth}*' if auth != '' else ''
         # published = single_news.published if not Message.is_youtube_feed(single_news) else ''
         link = self.single_news.link
         summary = self._parse_html() if not self._is_youtube_feed() else ''
-
         for field in (title, author, link, summary):
             if field != '' :
                 message += field + '\n'                
-
         return message
 
     def _parse_html(self): 

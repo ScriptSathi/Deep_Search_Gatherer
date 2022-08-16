@@ -60,8 +60,8 @@ class CommandMessage(Message):
         answer_to_user = self.builder.build_add_waiting_message()
         self._send_discord(answer_to_user, self.channel, True)
 
-    def send_add_success(self):
-        answer_to_user = self.builder.build_add_success_message()
+    def send_add_success(self, feed_name):
+        answer_to_user = self.builder.build_add_success_message(feed_name)
         self._send_discord(answer_to_user, self.channel, True)
 
     def send_add_error(self, **props):
@@ -80,5 +80,5 @@ class CommandMessage(Message):
         answer_to_user = self.builder.build_delete_error_message(**props)
         self._send_discord(answer_to_user, self.channel, True)
 
-    def set_data_submited(self, url_submited, channel_submited):
-        self.builder.set_data_submited(url_submited, channel_submited)
+    def set_data_submited(self, **options):
+        self.builder.set_data_submited(**options)

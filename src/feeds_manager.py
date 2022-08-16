@@ -31,7 +31,7 @@ class FeedsManager:
     async def _start_feeds(self, server_config):
         try:
             for feed_config in server_config['feeds']:
-                latest_post_in_feed = self._read_latest_post_file(feed_config['name'])
+                latest_post_in_feed = feed_config['last_post'] if 'last_post' in feed_config else ''
                 channel = await self._get_current_channel(feed_config)
                 rss_manager = Feed(feed_config, channel, latest_post_in_feed, self.generator_exist)
                 if bool(feed_config['is_valid_url']):
@@ -41,7 +41,7 @@ class FeedsManager:
                     logger.error(f"{feed_config['url']} is not a valid url, skipping")
         except Exception as e:
             if ("Unknown Channel" in str(e)):
-                self.parser.delete_channel_from_config(feed_config['channel'], server_config['id'])
+                self.parser.delete_from_config('channel', feed_config['channel'], server_config['id'])
                 logger.info(f"Channel {feed_config['channel']} does not exist. Deleting from config")
             else:
                 logger.exception(str(e))
@@ -55,21 +55,6 @@ class FeedsManager:
     async def _display_bot_game(self):
         game_displayed = self.config['game_displayed']
         await self.client.change_presence(activity=discord.Game(name=game_displayed))
-
-    def _read_latest_post_file(self, feed_name):
-        data_dir_path = Constants.feeds_data_dir
-        file_path = data_dir_path + '/' + feed_name
-        file_data = ''
-
-        if os.path.isfile(file_path):
-            with open(file_path, 'r') as file_buff:
-                file_data = file_buff.read()
-        else:
-            if not os.path.isdir(data_dir_path):
-                os.mkdir(data_dir_path)
-            with open(file_path, 'w') as file_buff:
-                file_buff.write(file_data)
-        return file_data
 
     async def _sleep_before_refresh(self) -> None:
         refresh_time = self.config['refresh_time']

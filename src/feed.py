@@ -29,9 +29,7 @@ class Feed:
     def _register_latest_post(self, news_to_save):
         if news_to_save != []:
             self.latest_post = news_to_save[0].title
-            file_path = Constants.feeds_data_dir + '/' + self.feed_config['name']
-            with open(file_path, 'w') as file_buff:
-                file_buff.write(self.latest_post)
+            self.feed_config['last_post'] = self.latest_post
 
     def _close_thread(self) -> None:
         sys.exit()
