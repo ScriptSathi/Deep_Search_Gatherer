@@ -8,9 +8,13 @@ services:
         target: /config/
     depends_on:
       - scrape2rss
+    volumes:
+      - backups:/home/rssbot/backups/
   scrape2rss:
     image: scrape2rss
     restart: on-failure
 configs:
   discord_bot_config_file:
     file: ./config_file
+volumes:
+  backups:
