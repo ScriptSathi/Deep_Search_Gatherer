@@ -109,7 +109,7 @@ class Parser:
     def _file_name(self) -> str:
         file_list = os.listdir(Constants.base_conf_path_dir)
         for file in file_list:
-            if ".json" or ".yaml" or ".yml" in file and file != Constants.backup_path:
+            if ".json" in file or ".yaml" in file or ".yml" in file and file != Constants.backup_path:
                 return file
 
     def _load_server_config(self, generator_exist, servers_config=[]):
