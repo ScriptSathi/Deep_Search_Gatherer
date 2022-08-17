@@ -76,13 +76,13 @@ class Utils:
             r'(?::\d+)?' # optional port
             r'(?:/?|[/?]\S+)$', re.IGNORECASE
         )
-        is_url_format_valid = re.match(regexp, url) is not None
-        if is_url_format_valid:
-            try:
+        try:
+            is_url_format_valid = re.match(regexp, url) is not None
+            if is_url_format_valid:
                 status = requests.get(url, timeout=5).status_code
                 is_valid = status == 200 and is_url_format_valid
-            except:
-                logger.warning(f"The submited url: {url} does not answer")
+        except:
+            logger.warning(f"The submited url: {url} does not answer")
         return is_valid
 
     async def is_a_valid_channel(client, channel_submited, server_id):

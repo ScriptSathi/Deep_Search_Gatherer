@@ -46,7 +46,7 @@ class BotCommands:
 
     def _handle_feeds_list(self):
         server_config = self.parser.get_server_config(self.server.id)
-        if server_config == []:
+        if server_config == [] or server_config['feeds'] == []:
             self.message.send_feeds_list_empty(self.server.name)
         else:
             self.message.send_feeds_list(self.server.name, server_config)

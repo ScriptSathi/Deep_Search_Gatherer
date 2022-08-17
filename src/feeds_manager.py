@@ -32,7 +32,6 @@ class FeedsManager:
                 await self._sleep_before_refresh(10)
                 await self.run()
 
-
     async def _start_feeds(self, server_config):
         try:
             for feed_config in server_config['feeds']:

@@ -22,9 +22,10 @@ class CommandMessageBuilder:
         self.feed_name_submited = options.pop('feed_name', '')
 
     def build_delete_waiting_message(self):
-        description = \
-            f"<@{self.author.id}> you asked for deleting `{self.feed_name_submited}`\n" +\
+        description = CommandBuilderUtils.build_multiple_line_string([
+            f"<@{self.author.id}> you asked for deleting `{self.feed_name_submited}`",
             f"I'm trying to delete the feed, please wait"
+        ])
         return discord.Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
@@ -60,9 +61,10 @@ class CommandMessageBuilder:
             .set_footer(text=f"Try again with a registered feed 🚨")
 
     def build_add_waiting_message(self):
-        description = \
-            f"<@{self.author.id}> you asked for adding `{self.url_submited}` in the channel `{self.channel_submited}`\n" +\
-            f"I'm trying to add the feed, please wait"
+        description = CommandBuilderUtils.build_multiple_line_string([
+            f"<@{self.author.id}> you asked for adding `{self.url_submited}` in the channel `{self.channel_submited}`",
+            f"I'm trying to add the feed, please wait",
+        ])
         return discord.Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
@@ -107,23 +109,29 @@ class CommandMessageBuilder:
             .set_footer(text=f"Try again with a valid {footers[status]} 🚨")
 
     def build_help_message(self, is_in_error=False):
-        desc_help = \
-            f"Hey <@{self.author.id}> ! You don't know me yet ?\n" +\
-            f"I've been created to help you getting in touch with any websites you want !\n" +\
-            f"Every time there will be a new article/video, i'll post it over discord on the channel you wanted\n" +\
+        desc_help = CommandBuilderUtils.build_multiple_line_string([
+            f"Hey <@{self.author.id}> ! You don't know me yet ?",
+            f"I've been created to help you getting in touch with any websites you want !",
+            f"Every time there will be a new article/video, i'll post it over discord on the channel you wanted",
             f"To help you using my services i'll tell you how i work."
-        desc_error = \
-            f"Hey <@{self.author.id}>, i miss understood your command\n" +\
-            f"I'll explain what i'm able to do\n"
+        ])
+        desc_error = CommandBuilderUtils.build_multiple_line_string([
+            f"Hey <@{self.author.id}>, i miss understood your command",
+            f"I'll explain what i'm able to do"
+        ])
         description = desc_error if is_in_error else desc_help
 
-        capabilites = \
-            f"- `Add` a new feed to the list on a specific channel\n" +\
-            f"- `Delete` a feed from the list on the current server"
+        capabilites = CommandBuilderUtils.build_multiple_line_string([
+            f"- `Add` a new feed to the list on a specific channel",
+            f"- `Delete` a feed from the list on the current server",
+            f"- `List` all the feeds registered in the server"
+        ])
 
-        examples = \
-            f"> **<@{self.bot_id}> add <url_to_follow> channel <channel_id>**\n" +\
-            f"> **<@{self.bot_id}> delete <url_to_delete>**"
+        examples = CommandBuilderUtils.build_multiple_line_string([
+            f"> **<@{self.bot_id}> add <url_to_follow> channel <channel_id> (name <feed_name>)**",
+            f"> **<@{self.bot_id}> delete <feed_name>**",
+            f"> **<@{self.bot_id}> list**"
+        ])
 
         return discord.Embed(
             title=Constants.bot_name,
@@ -160,16 +168,21 @@ class CommandMessageBuilder:
 
 class CommandBuilderUtils:
     def get_feed_list_message(server_config):
-        feeds_list = ""
-        for i, feed in enumerate(server_config['feeds']):
+        feeds_list = []
+        for feed in server_config['feeds']:
             feed_url = feed['url']
             if Utils.is_youtube_url(feed_url):
                 feed_url = Utils.get_youtube_channel_url(feed['url'])
-            feeds_list += f"**- Name: `{feed['name']}` with url: {feed_url}**"
-            if i <  len(server_config['feeds']) - 1:
-                feeds_list += "\n"
-        return feeds_list
+            feeds_list.append(f"**- Name: `{feed['name']}` with url: {feed_url}**")
+        return CommandBuilderUtils.build_multiple_line_string(feeds_list)
 
+    def build_multiple_line_string(array_of_messages):
+        output_msg = ""
+        for i, msg in enumerate(array_of_messages):
+            output_msg += msg
+            if i <  len(array_of_messages) - 1:
+                output_msg += "\n"
+        return output_msg
 
 class NewsMessageBuilder:
     

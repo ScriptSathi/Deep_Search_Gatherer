@@ -11,7 +11,7 @@ class Constants:
     default_config = {
         "token": "",
         "servers": [],
-        "published_since_default": 86000,
+        "published_since_default": 0,
         "refresh_time": 900,
         'game_displayed': "Eating some RSS feeds",
     }
