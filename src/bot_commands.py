@@ -1,15 +1,17 @@
+import discord
+
 from src.utils import Utils
 from src.logger import Logger
 from src.message import CommandMessage
-from src.context import ContextUtils
+from src.context import ContextUtils, Context
 
 logger = Logger.get_logger()
 
 class BotCommands:
 
     def __init__(self, client, context, message, generator_exist) -> None:
-        self.client = client
-        self.context = context
+        self.client: discord.Client = client
+        self.context: Context = context
         self.generator_exist = generator_exist
         self.author = message.author
         self.channel = message.channel

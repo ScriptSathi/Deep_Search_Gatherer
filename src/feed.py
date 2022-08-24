@@ -33,7 +33,7 @@ class Feed:
             "name": self.name,
             "url": self.url,
             "last_post": self.latest_post,
-            "channel": self.channel.id,
+            "channel": self.channel_obj.id,
             "is_valid_url": self.is_valid_url,
             "published_since": self.published_since,
         }

@@ -1,5 +1,6 @@
 import os, json, yaml
 
+from src.backup import Backup
 from src.constants import Constants
 from src.logger import Logger
 from src.utils import Utils
@@ -53,20 +54,6 @@ class Context:
             self.servers_config.append(new_server)
         return feed.name
 
-    def create_backup_servers_config(self):
-        if self.servers_config != []:
-            yaml_text = yaml.dump({"servers": self.servers_config})
-            try:
-                with open(Constants.backup_path, 'w') as yaml_file:
-                    try:
-                        yaml_file.write(yaml_text)
-                    finally:
-                        yaml_file.close()
-            except Exception as e:
-                logger.exception(str(e))
-                os.mkdir(Constants.backup_dir_path)
-                self.create_backup_servers_config()
-
     def delete_from_config(self, field_name_to_remove, field_value_to_remove, server_id):
         feed_is_removed = False
         for server in self.servers_config:
@@ -79,45 +66,8 @@ class Context:
             raise # for trigger Message.send_delete_error()
         logger.info(f"Successfully deleting {field_name_to_remove} from server {server_id}")
 
-    def _build_feed(self, 
-        name,
-        url,
-        channel_obj,
-        latest_post_in_feed,
-        is_valid_url,
-        published_since,
-        generator_exist
-     ):
-        url = Utils.get_youtube_feed_url(url) \
-            if 'youtu' in url and "feeds" not in url \
-            else url
-        is_valid_url = Utils.sanitize_check(url, generator_exist)
-        name = name if name != "" else f"{channel_obj.name}-{Utils.generate_random_string()}"
-        return Feed(name, url, channel_obj, latest_post_in_feed, is_valid_url, published_since, generator_exist)
-
-    def _get_data_from_backup_file(self, file_path) -> bool:
-        config = []
-        try:
-            if os.path.isfile(file_path):
-                config_file_content = open(file_path,'r').read()
-                try:
-                    config = json.loads(config_file_content)
-                except:
-                    config = yaml.safe_load(config_file_content)
-                return config
-        except Exception:
-            logger.info(f'You must submit a valid file in path: {Constants.base_conf_path_dir} file dir')
-            return config
-
-    def _file_name(self) -> str:
-        file_list = os.listdir(Constants.base_conf_path_dir)
-        for file in file_list:
-            if ".json" in file or ".yaml" in file or ".yml" in file and file != Constants.backup_path:
-                return file
-
     async def load_servers_context(self, generator_exist):
-        servers_config = []
-        # servers_config = self._load_backup_servers_config()
+        servers_config = Backup.read()
         if servers_config != []:
             for server in servers_config:
                 server = {
@@ -138,13 +88,27 @@ class Context:
                     )
                 self.servers_config.append(server)
 
-    def _load_backup_servers_config(self):
-        try:
-            with open(Constants.backup_path, 'r') as yaml_file:
-                logger.info('Backup loaded successfully')
-                return yaml.safe_load(yaml_file)['servers']
-        except:
-            return []
+    def _build_feed(self, 
+        name,
+        url,
+        channel_obj,
+        latest_post_in_feed,
+        is_valid_url,
+        published_since,
+        generator_exist
+     ):
+        url = Utils.get_youtube_feed_url(url) \
+            if 'youtu' in url and "feeds" not in url \
+            else url
+        is_valid_url = Utils.sanitize_check(url, generator_exist)
+        name = name if name != "" else f"{channel_obj.name}-{Utils.generate_random_string()}"
+        return Feed(name, url, channel_obj, latest_post_in_feed, is_valid_url, published_since, generator_exist)
+
+    def _file_name(self) -> str:
+        file_list = os.listdir(Constants.base_conf_path_dir)
+        for file in file_list:
+            if ".json" in file or ".yaml" in file or ".yml" in file and file != Constants.backup_path:
+                return file
 
     def _is_server_already_registered(self, server_to_submit):
         server_is_registered = False
@@ -155,7 +119,7 @@ class Context:
 
     def _load_base_context(self):
         config_path = os.path.join(Constants.base_conf_path_dir, self._file_name())
-        base_config = self._get_data_from_backup_file(config_path)
+        base_config = ContextUtils.read_config_file(config_path)
         if base_config != []:
             for key, value in base_config.items():
                 self.base_config[key] = value
@@ -168,3 +132,17 @@ class ContextUtils:
         except:
             logger.warning(f"The submited channel: {channel_id} is not valid")
         return channel_obj
+
+    def read_config_file(file_path) -> bool:
+        config = []
+        try:
+            if os.path.isfile(file_path):
+                config_file_content = open(file_path,'r').read()
+                try:
+                    config = json.loads(config_file_content)
+                except:
+                    config = yaml.safe_load(config_file_content)
+                return config
+        except Exception:
+            logger.info(f'You must submit a valid file in path: {Constants.base_conf_path_dir} file dir')
+            return config

@@ -1,9 +1,8 @@
 import discord, asyncio
 from threading import Thread
 
-from src.feed import Feed
+from src.backup import Backup
 from src.logger import Logger
-from src.constants import Constants
 
 logger = Logger.get_logger()
 
@@ -23,7 +22,7 @@ class FeedsManager:
                             await self._start_feeds(server_config)
                         else:
                             logger.info(f"The server {server_config['id']} as no feeds set, skipping")
-                    # self.context.create_backup_servers_config()
+                    Backup.save(self.context.servers_config)
                     await self._sleep_before_refresh()
             else:
                 logger.info('No servers config set yet')
