@@ -84,18 +84,6 @@ class Utils:
         except:
             logger.warning(f"The submited url: {url} does not answer")
         return is_valid
-
-    async def is_a_valid_channel(client, channel_submited, server_id):
-        is_valid = False
-        channel_name = channel_submited
-        try:
-            channel_obj = await client.fetch_channel(channel_submited)
-            if channel_obj.guild.id == server_id:
-                is_valid = True
-                channel_name = channel_obj.name
-        except:
-            logger.warning(f"The submited channel: {channel_submited} is not valid")
-        return channel_name, is_valid
     
     def generate_random_string():
         random_string = ""

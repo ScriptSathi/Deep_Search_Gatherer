@@ -1,14 +1,15 @@
 from src.utils import Utils
 from src.logger import Logger
 from src.message import CommandMessage
+from src.context import ContextUtils
 
 logger = Logger.get_logger()
 
 class BotCommands:
 
-    def __init__(self, client, parser, message, generator_exist) -> None:
+    def __init__(self, client, context, message, generator_exist) -> None:
         self.client = client
-        self.parser = parser
+        self.context = context
         self.generator_exist = generator_exist
         self.author = message.author
         self.channel = message.channel
@@ -41,7 +42,7 @@ class BotCommands:
             self.message.send_help(is_in_error=True)
 
     def _handle_feeds_list(self):
-        server_config = self.parser.get_server_config(self.server.id)
+        server_config = self.context.get_server_config(self.server.id)
         if server_config == [] or server_config['feeds'] == []:
             self.message.send_feeds_list_empty(self.server.name)
         else:
@@ -49,15 +50,14 @@ class BotCommands:
 
     async def _handle_adding_feed(self, url_submited, channel_submited, name_submited):
         url_is_valid = Utils.is_a_valid_url(url_submited)
-        channel_name, channel_is_valid = await Utils.is_a_valid_channel(self.client, channel_submited, self.server.id)
-        self.message.set_data_submited(channel=channel_name, url=url_submited)
-        self.message.send_add_waiting()
-        if url_is_valid and channel_is_valid:
+        channel_obj = await ContextUtils.get_channel_object(self.client, channel_submited)
+        if url_is_valid and channel_obj != None:
+            self.message.set_data_submited(channel=channel_obj.name, url=url_submited)
+            self.message.send_add_waiting()
             try:
-                feed_name = self.parser.append_new_feed(
-                    url_submited, 
-                    channel_submited, 
-                    channel_name, 
+                feed_name = self.context.append_new_feed(
+                    url_submited,
+                    channel_obj,
                     self.server.id,
                     self.generator_exist,
                     name_submited
@@ -65,19 +65,20 @@ class BotCommands:
                 self.message.send_add_success(feed_name)
             except:
                 self.message.send_add_error(url_in_error=True)
-        elif url_is_valid and not channel_is_valid:
+        elif url_is_valid and not channel_obj != None:
             self.message.send_add_error(channel_in_error=True)
-        elif not url_is_valid and channel_is_valid:
+        elif not url_is_valid and channel_obj != None:
             self.message.send_add_error(url_in_error=True)
         else:
             self.message.send_add_error()
 
     async def _handle_deletion_feed(self, server_id, feed_name):
+        logger.info(feed_name)
         self.message.set_data_submited(feed_name=feed_name)
         self.message.send_delete_waiting()
         if feed_name != '':
             try:
-                self.parser.delete_from_config('name', feed_name, server_id)
+                self.context.delete_from_config('name', feed_name, server_id)
                 self.message.send_delete_success()
             except:
                 self.message.send_delete_error()
@@ -94,13 +95,15 @@ class BotCommands:
             is_not_last_elem_in_list = elem !=  user_cmd[-1]
             if is_not_last_elem_in_list: 
                 add_trigger = 1
-                is_trigger = BotCommandsUtils.get_command_name(self.msg_content)              
+                is_trigger = BotCommandsUtils.get_command_name(self.msg_content)
                 if add_trigger == is_trigger:
-                    url_submited = user_cmd[i+1]
-                elif Utils.is_include_in_string(["channel", "chan"], elem):
-                    channel_submited = user_cmd[i+1]
-                elif Utils.is_include_in_string("name", elem)\
-                    or Utils.is_include_in_string(["delete", "dl", "del"], elem):
+                    if Utils.is_include_in_string("add", elem):
+                        url_submited = user_cmd[i+1]
+                    if Utils.is_include_in_string(["channel", "chan"], elem):
+                        channel_submited = user_cmd[i+1]
+                    if Utils.is_include_in_string("name", elem):
+                        name_submitted = user_cmd[i+1]
+                elif Utils.is_include_in_string(["delete", "dl", "del"], elem):
                     name_submitted = user_cmd[i+1]
         return url_submited, channel_submited, name_submitted
 

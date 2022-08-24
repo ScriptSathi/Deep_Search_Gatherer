@@ -34,7 +34,7 @@ class CommandMessageBuilder:
             )
 
     def build_delete_success_message(self):
-        description = f"The feed as been correctly deleted\n"
+        description = f"The feed has been correctly deleted\n"
         return discord.Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
@@ -170,10 +170,10 @@ class CommandBuilderUtils:
     def get_feed_list_message(server_config):
         feeds_list = []
         for feed in server_config['feeds']:
-            feed_url = feed['url']
+            feed_url = feed.url
             if Utils.is_youtube_url(feed_url):
-                feed_url = Utils.get_youtube_channel_url(feed['url'])
-            feeds_list.append(f"**- Name: `{feed['name']}` with url: {feed_url}**")
+                feed_url = Utils.get_youtube_channel_url(feed.url)
+            feeds_list.append(f"**- Name: `{feed.name}` with url: {feed_url}**")
         return CommandBuilderUtils.build_multiple_line_string(feeds_list)
 
     def build_multiple_line_string(array_of_messages):
