@@ -22,22 +22,18 @@ class BotCommands:
         )
 
     async def handle_messages(self):
-        help_triggered = Utils._message_is_empty(self.msg_content) \
-            or Utils.is_include_in_string(["help", "-h"], self.msg_content)
-        add_triggered = Utils.is_include_in_string("add", self.msg_content)
-        delete_triggered = Utils.is_include_in_string(["delete", "dl", "del"], self.msg_content)
-        feeds_list_triggered = Utils.is_include_in_string(["list", "ls"], self.msg_content)
-
-        if feeds_list_triggered:
+        help_trigger, add_trigger, delete_trigger, list_trigger = (0,1,2,3)
+        is_trigger = BotCommandsUtils.get_command_name(self.msg_content)
+        if list_trigger == is_trigger:
             self._handle_feeds_list()
-        elif help_triggered:
+        elif help_trigger == is_trigger:
             self.message.send_help()
-        elif add_triggered or delete_triggered:
+        elif add_trigger == is_trigger or delete_trigger == is_trigger:
             url_submited, channel_submited, name_submited = self._get_message_data()
             if url_submited == "" and name_submited == "":
                 self.message.send_help(is_in_error=True)
             else:
-                if add_triggered:
+                if add_trigger == is_trigger:
                     await self._handle_adding_feed(url_submited, channel_submited, name_submited)
                 else:
                     await self._handle_deletion_feed(self.server.id, name_submited)
@@ -96,8 +92,10 @@ class BotCommands:
         user_cmd = list(filter(None, array_string))
         for i, elem in enumerate(user_cmd):
             is_not_last_elem_in_list = elem !=  user_cmd[-1]
-            if is_not_last_elem_in_list:
-                if Utils.is_include_in_string("add", elem):
+            if is_not_last_elem_in_list: 
+                add_trigger = 1
+                is_trigger = BotCommandsUtils.get_command_name(self.msg_content)              
+                if add_trigger == is_trigger:
                     url_submited = user_cmd[i+1]
                 elif Utils.is_include_in_string(["channel", "chan"], elem):
                     channel_submited = user_cmd[i+1]
@@ -105,3 +103,18 @@ class BotCommands:
                     or Utils.is_include_in_string(["delete", "dl", "del"], elem):
                     name_submitted = user_cmd[i+1]
         return url_submited, channel_submited, name_submitted
+
+class BotCommandsUtils:
+    def get_command_name(full_message_str):
+        help_trigger, add_trigger, delete_trigger, list_trigger = (0,1,2,3)
+        msg = full_message_str.split()
+        if Utils.is_include_in_string('help', msg[1]) or Utils.is_include_in_string('-h', msg[1]):
+            return help_trigger
+        elif Utils.is_include_in_string('add', msg[1]):
+            return add_trigger
+        elif Utils.is_include_in_string('delete', msg[1]) or Utils.is_include_in_string('del', msg[1]):
+            return delete_trigger
+        elif Utils.is_include_in_string('list', msg[1]) or Utils.is_include_in_string('ls', msg[1]):
+            return list_trigger
+        else:
+            return 100
