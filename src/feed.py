@@ -47,7 +47,7 @@ class Feed:
 
     def _send_message_if_needed(self) -> None:
         if self.news_to_publish == []:
-            logger.info(f"{self.name}: No news to share")
+            self.message.send_no_news()
         else:
            self._post_news_on_discord(self.news_to_publish)
 

@@ -54,17 +54,14 @@ class Context:
 
     def delete_from_config(self, field_name_to_remove, field_value_to_remove, server_id):
         feed_is_removed = False
-        feed_name = ""
         for server in self.servers_config:
             if server['id'] == server_id:
                 for feed in server['feeds']:
                     if getattr(feed, field_name_to_remove) == field_value_to_remove:
                         server['feeds'].remove(feed)
-                        feed_name = feed.name
                         feed_is_removed = True
         if not feed_is_removed:
             raise # for trigger Message.send_delete_error()
-        logger.info(f"Successfully deleting {feed_name} from server {server_id}")
 
     async def load_context_from_backup(self, generator_exist, client):
         full_backup = Backup.read()

@@ -20,7 +20,7 @@ class BotCommands:
         self.message = CommandMessage(self.client,
             msg_content=self.msg_content,
             author=self.author,
-            channel=self.channel,
+            channel_obj=self.channel,
             server_name=self.server.name
         )
 
@@ -64,7 +64,7 @@ class BotCommands:
                     self.generator_exist,
                     name_submited
                 )
-                self.message.send_add_success(feed_name)
+                self.message.send_add_success(feed_name, url_submited)
             except:
                 self.message.send_add_error(url_in_error=True)
         elif url_is_valid and not channel_obj != None:
@@ -77,14 +77,15 @@ class BotCommands:
             self.message.send_add_error()
 
     async def _handle_deletion_feed(self, server_id, feed_name):
-        logger.info(feed_name)
         self.message.set_data_submited(feed_name=feed_name)
         self.message.send_delete_waiting()
         if feed_name != '':
             try:
                 self.context.delete_from_config('name', feed_name, server_id)
-                self.message.send_delete_success()
+                self.message.send_delete_success(feed_name)
             except:
+                logger.info("AAAAA")
+                logger.exception(Exception)
                 self.message.send_delete_error()
         else:
             self.message.send_delete_error()
