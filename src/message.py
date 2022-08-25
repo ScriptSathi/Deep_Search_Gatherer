@@ -31,9 +31,9 @@ class Message:
         base_message = f"On {self.server_name}({self.server_id})"
 
         if is_a_news:
-            logger.info(f'{base_message} {self.feed_name} Publishing on channel "{self.channel_obj.name}" - "{news.title}"')
+            logger.info(f'{base_message} - {self.feed_name} - Publishing on channel "{self.channel_obj.name}" - "{news.title}"')
         elif no_news:
-            logger.info(f"{base_message} {self.feed_name} No news to share")
+            logger.info(f"{base_message} - {self.feed_name} - No news to share")
         elif add != {}:
             logger.info(f"{base_message} - Successfully adding {add['name']} with url {add['url']}")
         elif delete != {}:

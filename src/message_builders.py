@@ -150,10 +150,9 @@ class CommandMessageBuilder:
         return discord.Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
-                description=description,
+                description=description + "\n" + feed_list,
                 color=discord.Color.orange()
-            )\
-            .add_field(name="__Feeds:__", value=feed_list, inline=False)
+                )
 
     def build_feeds_list_empty_message(self, server_name):
         description = \
@@ -168,7 +167,7 @@ class CommandMessageBuilder:
 
 class CommandBuilderUtils:
     def get_feed_list_message(server_config):
-        feeds_list = []
+        feeds_list = ["**__Feeds:__**"]
         for feed in server_config['feeds']:
             feed_url = feed.url
             if Utils.is_youtube_url(feed_url):

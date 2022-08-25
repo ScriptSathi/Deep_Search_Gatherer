@@ -84,8 +84,6 @@ class BotCommands:
                 self.context.delete_from_config('name', feed_name, server_id)
                 self.message.send_delete_success(feed_name)
             except:
-                logger.info("AAAAA")
-                logger.exception(Exception)
                 self.message.send_delete_error()
         else:
             self.message.send_delete_error()
