@@ -17,7 +17,7 @@ class Utils:
 
     def get_youtube_feed_url(url):
         consent_cookie = {"CONSENT": "YES+"}
-        html_content = requests.get(url, cookies=consent_cookie).text
+        html_content = Utils.get_request(url, cookies=consent_cookie).text
         line_str = re.findall(r"channel_id=([A-Za-z0-9\-\_]+)", html_content)
         return f'https://www.youtube.com/feeds/videos.xml?channel_id={line_str[0]}'
     
@@ -52,7 +52,7 @@ class Utils:
                 feed_data = feedparser.parse(url).entries
                 if feed_data == [] and generator_exist:
                     api_gen_url = Constants.api_url + "/create?url=" + url
-                    status = requests.get(api_gen_url, timeout=5).status_code
+                    status = Utils.get_request(api_gen_url).status_code
                     is_valid = status == 200
                 elif feed_data != []:
                     is_valid = True
@@ -74,17 +74,18 @@ class Utils:
             r'localhost|' #localhost...
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
             r'(?::\d+)?' # optional port
-            r'(?:/?|[/?]\S+)$', re.IGNORECASE
+            r'(?:/?|[/.?]\S+)$', re.IGNORECASE
         )
         try:
             is_url_format_valid = re.match(regexp, url) is not None
             if is_url_format_valid:
-                status = requests.get(url, timeout=5).status_code
+                status = Utils.get_request(url).status_code
                 is_valid = status == 200 and is_url_format_valid
         except:
+            logger.exception(Exception)
             logger.warning(f"The submited url: {url} does not answer")
         return is_valid
-    
+
     def generate_random_string():
         random_string = ""
         for _ in range(5):
@@ -93,3 +94,20 @@ class Utils:
             random_integer = random_integer - 32 if flip_bit == 1 else random_integer
             random_string += (chr(random_integer))
         return random_string
+
+    def everyone_tag_is_not_used(message):
+        return not Utils.is_include_in_string('everyone', message)
+
+    def get_request(url, **options):
+        extra_cookies = options.pop('cookies', {})
+        extra_headers = options.pop('headers', {})
+        timeout = options.pop('timeout', 5)
+        headers = {
+            "User-Agent": f"Mozilla/5.0 - This is a bot from this project {Constants.source_code_url}."
+                + "Please do not ban me. It has been build to help following content using RSS feeds."
+                + f"The purpose is only to gather informations every {Constants.base_config_default['refresh_time']} seconds",
+            "Retry-After": "5",
+            }
+        for key, value in extra_headers.items():
+            headers[key] = value
+        return requests.get(url, timeout=timeout, headers=headers, cookies=extra_cookies)

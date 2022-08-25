@@ -68,8 +68,10 @@ class BotCommands:
             except:
                 self.message.send_add_error(url_in_error=True)
         elif url_is_valid and not channel_obj != None:
+            self.message.set_data_submited(channel=channel_submited, url=url_submited)
             self.message.send_add_error(channel_in_error=True)
         elif not url_is_valid and channel_obj != None:
+            self.message.set_data_submited(channel=channel_obj.name, url=url_submited)
             self.message.send_add_error(url_in_error=True)
         else:
             self.message.send_add_error()
@@ -113,7 +115,7 @@ class BotCommandsUtils:
     def get_command_name(full_message_str):
         help_trigger, add_trigger, delete_trigger, list_trigger = (0,1,2,3)
         msg = full_message_str.split()
-        if Utils.is_include_in_string('help', msg[1]) or Utils.is_include_in_string('-h', msg[1]):
+        if len(msg) == 1 or Utils.is_include_in_string('help', msg[1]) or Utils.is_include_in_string('-h', msg[1]):
             return help_trigger
         elif Utils.is_include_in_string('add', msg[1]):
             return add_trigger

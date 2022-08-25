@@ -1,9 +1,11 @@
 import discord
+
 from src.logger import Logger
 from src.context import Context
 from src.rss_gen import RSSGenerator
 from src.feeds_manager import FeedsManager
 from src.bot_commands import BotCommands
+from src.utils import Utils
 
 logger = Logger.get_logger()
 
@@ -16,11 +18,13 @@ class Bot(discord.Client):
     async def on_ready(self) -> None:
         logger.info(f'Logged in as {self.user} (ID: {self.user.id})')
         logger.info('------')
-        await context.load_servers_context(self.generator_exist)
+        await context.load_context_from_backup(self.generator_exist, self)
         await self.loop.create_task(self._prepare_and_run())
 
     async def on_message(self, message):
-        if message.author.id != self.user.id and self.user.mentioned_in(message):
+        if (message.author.id != self.user.id \
+            and self.user.mentioned_in(message)\
+            and Utils.everyone_tag_is_not_used(message.content)):
             await BotCommands(self, self.context, message, self.generator_exist).handle_messages()
 
     async def _prepare_and_run(self):

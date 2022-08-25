@@ -12,8 +12,8 @@ class CommandMessageBuilder:
         self.content = content
         self.channel = channel
         self.server_id = server
-        self.url_submited = ""
-        self.channel_submited = ""
+        self.url_submited = "Unknown"
+        self.channel_submited = "Unknown"
         self.feed_name_submited = ""
 
     def set_data_submited(self, **options):

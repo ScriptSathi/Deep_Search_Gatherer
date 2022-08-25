@@ -1,4 +1,4 @@
-import os, json, yaml
+import os, json, yaml, discord
 
 from src.backup import Backup
 from src.constants import Constants
@@ -31,13 +31,11 @@ class Context:
         name_submited
     ):
         last_post = ''
-        is_valid_url = Utils.sanitize_check(url_submited, generator_exist)
-        feed = self._build_feed(
+        feed = self._create_feed(
             name_submited,
             url_submited,
             channel_obj,
             last_post,
-            is_valid_url,
             Constants.base_config_default["published_since_default"],
             generator_exist
         )
@@ -56,44 +54,45 @@ class Context:
 
     def delete_from_config(self, field_name_to_remove, field_value_to_remove, server_id):
         feed_is_removed = False
+        feed_name = ""
         for server in self.servers_config:
             if server['id'] == server_id:
                 for feed in server['feeds']:
                     if getattr(feed, field_name_to_remove) == field_value_to_remove:
                         server['feeds'].remove(feed)
+                        feed_name = feed.name
                         feed_is_removed = True
         if not feed_is_removed:
             raise # for trigger Message.send_delete_error()
-        logger.info(f"Successfully deleting {field_name_to_remove} from server {server_id}")
+        logger.info(f"Successfully deleting {feed_name} from server {server_id}")
 
-    async def load_servers_context(self, generator_exist):
-        servers_config = Backup.read()
-        if servers_config != []:
-            for server in servers_config:
+    async def load_context_from_backup(self, generator_exist, client):
+        full_backup = Backup.read()
+        if full_backup != []:
+            for server_backup in full_backup:
                 server = {
-                    "id": server['id'],
+                    "id": server_backup['id'],
                     "feeds": []
                 }
-                for feed_config in server["feeds"]:
-                    channel_obj = await ContextUtils.get_channel_object(self.client, feed_config['channel'])
-                    server['feeds'].append(self._build_feed(
-                        feed_config['name'],
-                        feed_config['url'],
-                        channel_obj,
-                        feed_config['last_post'],
-                        feed_config['name'],
-                        feed_config["published_since"],
-                        generator_exist
+                for feed_config in server_backup["feeds"]:
+                    channel_obj = await ContextUtils.get_channel_object(client, feed_config['channel'])
+                    if channel_obj != None:
+                        server['feeds'].append(self._create_feed(
+                            feed_config['name'],
+                            feed_config['url'],
+                            channel_obj,
+                            feed_config['last_post'],
+                            feed_config["published_since"],
+                            generator_exist
+                            )
                         )
-                    )
                 self.servers_config.append(server)
 
-    def _build_feed(self, 
+    def _create_feed(self,
         name,
         url,
         channel_obj,
         latest_post_in_feed,
-        is_valid_url,
         published_since,
         generator_exist
      ):
@@ -104,12 +103,6 @@ class Context:
         name = name if name != "" else f"{channel_obj.name}-{Utils.generate_random_string()}"
         return Feed(name, url, channel_obj, latest_post_in_feed, is_valid_url, published_since, generator_exist)
 
-    def _file_name(self) -> str:
-        file_list = os.listdir(Constants.base_conf_path_dir)
-        for file in file_list:
-            if ".json" in file or ".yaml" in file or ".yml" in file and file != Constants.backup_path:
-                return file
-
     def _is_server_already_registered(self, server_to_submit):
         server_is_registered = False
         for server in self.servers_config:
@@ -118,14 +111,14 @@ class Context:
         return server_is_registered
 
     def _load_base_context(self):
-        config_path = os.path.join(Constants.base_conf_path_dir, self._file_name())
+        config_path = os.path.join(Constants.base_conf_path_dir, ContextUtils.file_name())
         base_config = ContextUtils.read_config_file(config_path)
         if base_config != []:
             for key, value in base_config.items():
                 self.base_config[key] = value
 
 class ContextUtils:
-    async def get_channel_object(client, channel_id):
+    async def get_channel_object(client: discord.Client, channel_id):
         channel_obj = None
         try:
             channel_obj = await client.fetch_channel(str(channel_id))
@@ -146,3 +139,9 @@ class ContextUtils:
         except Exception:
             logger.info(f'You must submit a valid file in path: {Constants.base_conf_path_dir} file dir')
             return config
+
+    def file_name() -> str:
+        file_list = os.listdir(Constants.base_conf_path_dir)
+        for file in file_list:
+            if ".json" in file or ".yaml" in file or ".yml" in file and file != Constants.backup_path:
+                return file

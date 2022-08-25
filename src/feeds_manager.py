@@ -1,4 +1,4 @@
-import discord, asyncio
+import asyncio
 from threading import Thread
 
 from src.backup import Backup

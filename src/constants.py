@@ -7,7 +7,6 @@ class Constants:
     base_conf_path_dir = os.path.join('/config')
     backup_dir_path = os.path.join(home_dir, 'backups')
     backup_path = os.path.join(backup_dir_path, 'backup.yaml')
-    feeds_data_dir = os.path.join(home_dir, 'feeds_data')
     base_config_default = {
         "token": "",
         "servers": [],
