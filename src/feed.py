@@ -90,6 +90,8 @@ class Feed:
     def _get_feed_data(self, feed_url): # TODO Refacto this with a "try again" behaviour for is_valid_url
         xml_entries = feedparser.parse(feed_url).entries
         if xml_entries != []:
+            if Utils.is_reddit_url(feed_url):
+                xml_entries.pop(0)
             return xml_entries
         elif self.generator_exist:
             rss_feed = RSSGenerator(feed_url).render_xml_feed()

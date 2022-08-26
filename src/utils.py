@@ -12,7 +12,6 @@ class Utils:
             timezone = pytz.timezone(tz)
         except Exception:
             timezone = pytz.utc
-
         return timezone
 
     def get_youtube_feed_url(url):
@@ -20,12 +19,15 @@ class Utils:
         html_content = Utils.get_request(url, cookies=consent_cookie).text
         line_str = re.findall(r"channel_id=([A-Za-z0-9\-\_]+)", html_content)
         return f'https://www.youtube.com/feeds/videos.xml?channel_id={line_str[0]}'
-    
+
     def get_youtube_channel_url(feed_url):
         return feedparser.parse(feed_url).feed['link']
 
     def is_youtube_url(url) -> bool:
-        return 'youtu' in url
+        return url.startswith("https://www.youtube.com")
+
+    def is_reddit_url(url) -> bool:
+        return url.startswith("https://www.reddit.com")
 
     def is_include_in_string(include_to_test, string):
         if isinstance(include_to_test, str) or isinstance(include_to_test, int):
