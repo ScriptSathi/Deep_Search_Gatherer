@@ -5,10 +5,7 @@ from src.rss import RSS
 from src.generic_types import Feed
 from src.registered_data import RegisteredServer
 
-from src.logger import Logger
-logger = Logger.get_logger()
-
-class FeedsManager: ## A tester
+class FeedsManager:
 
     feeds: List[List[Feed]] = [[],[],[]]
 
@@ -17,7 +14,6 @@ class FeedsManager: ## A tester
 
     def remove_feed(self, type: int, uid: int) -> None:
         _.pop(self.feeds[type], self._get_feed_index(type, "uid", uid))
-        logger.info("remove feed_manager")
 
     def create_feed(self,
         type: int,

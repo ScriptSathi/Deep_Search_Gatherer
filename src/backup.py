@@ -16,25 +16,6 @@ class Backup:
         try:
             with open(Constants.backup_path, 'r') as yaml_file:
                 backup_data = yaml.safe_load(yaml_file)['servers']
-                # backup_data = [
-                #     {
-                #         "id": 989551673200504833,
-                #         "name": "Poubelle",
-                #         "feeds": [{
-                #             "name": "TheHackerNews",
-                #             "url": "https://feeds.feedburner.com/TheHackersNews",
-                #             "last_post": "New Golang-based 'Agenda Ransomware' Can Be Customized For Each Victim",
-                #             "channels": [989926282613624842],
-                #         },
-                #         {
-                #             "name": "Cert-fr",
-                #             "url": "https://www.cert.ssi.gouv.fr/avis/feed/",
-                #             "last_post": "CERTFR-2022-AVI-776 : Multiples vulnérabilités dans Moodle (29 août 2022)",
-                #             "channels": [989883740740255854],
-                #         }
-                #         ],
-                #     }
-                # ]
                 for server_data in backup_data:
                     for feed_data in server_data['feeds']:
                         feed_channels: List[TextChannel] = []

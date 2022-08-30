@@ -1,5 +1,6 @@
 import re
 from discord import TextChannel, User, Color, Embed
+from src.rss import RSS
 from src.registered_data import RegisteredServer
 from src.utils import Utils
 
@@ -174,7 +175,7 @@ class CommandBuilderUtils:
         for feed in server_config.feeds:
             feed_url = feed.url
             if Utils.is_youtube_url(feed.url):
-                feed_url = Utils.get_youtube_channel_url(feed.url)
+                feed_url = RSS.get_youtube_channel_url(feed.url)
             feeds_list.append(f"**- Name: `{feed.name}` with url: {feed_url}**")
         return CommandBuilderUtils.build_multiple_line_string(feeds_list)
 

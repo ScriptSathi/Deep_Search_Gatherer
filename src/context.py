@@ -8,9 +8,6 @@ from src.generic_types import Feed
 from src.feeds_manager import FeedsManager
 from src.registered_data import RegisteredServer, RegisteredFeed
 
-from src.logger import Logger
-logger = Logger.get_logger()
-
 class Context:
     client: Client
     registered_data: List[RegisteredServer] = []
@@ -41,6 +38,7 @@ class Context:
     def remove(self, **options) -> None:
         if "with_feed" in options:
             feed, type = options.get('with_feed')
+            server_id = feed.server_on.id
         else:
             feed_name, server_id = options.get('without_feed')
             feed = ContextUtils.get_registered_feed(feed_name,

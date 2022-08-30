@@ -1,4 +1,3 @@
-import time
 import pytz, requests, re, feedparser, random
 from asyncio import sleep
 from src.logger import Logger
@@ -20,9 +19,6 @@ class Utils:
         html_content = Utils.get_request(url, cookies=consent_cookie).text
         line_str = re.findall(r"channel_id=([A-Za-z0-9\-\_]+)", html_content)
         return f'https://www.youtube.com/feeds/videos.xml?channel_id={line_str[0]}'
-
-    def get_youtube_channel_url(feed_url) -> str:
-        return feedparser.parse(feed_url).feed['link']
 
     def is_youtube_url(url) -> bool:
         return url.startswith("https://www.youtube.com")
@@ -121,18 +117,4 @@ class Utils:
                     retry_delay = 2
                     logger.error(f"Fail, retry in {retry_delay} seconds")
                     await sleep(retry_delay)
-                resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
-
-    def sync_try_again_if_fail(resolve, max_retry=3, **args) -> None:
-        for attempt in range(max_retry):
-            try:
-                resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
-                break
-            except Exception:
-                if "reject" in args:
-                    args["reject"](Exception, *args["resolve_args"]) if "reject_args" not in args else args["reject"]()
-                if attempt < max_retry:
-                    retry_delay = 2
-                    logger.error(f"Fail, retry in {retry_delay} seconds")
-                    time.sleep(retry_delay)
                 resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()

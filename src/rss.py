@@ -1,6 +1,7 @@
 from discord import Client, TextChannel
 from typing import Any, Dict, List, Union
 import feedparser, datetime, sys
+from time import sleep
 
 from dateutil import parser
 
@@ -10,15 +11,15 @@ from src.utils import Utils
 from src.generic_types import Feed, Feed_backup_dict
 from src.registered_data import RegisteredServer
 
-from src.logger import Logger
-logger = Logger.get_logger()
-
 class RSS(Feed):
 
     def find_feed_name(url: str):
         data = feedparser.parse(url)
         name = data.feed['title'] if "title" in data.feed else f"feed-{Utils.generate_random_string()}"
         return name.replace(" ", "-")
+
+    def get_youtube_channel_url(feed_url) -> str:
+        return feedparser.parse(feed_url).feed['link']
 
     def __init__(self,
         client: Client,
@@ -31,7 +32,7 @@ class RSS(Feed):
         last_post: str
     ) -> None:
         super().__init__(client, channels, name, url, server_on, uid, generator_exist, last_post)
-        self.published_since = 16000 # FOR TEST ONLY
+        self.published_since = 0
 
     def run(self) -> None:
         self.news_to_publish = self._get_news()
@@ -69,11 +70,6 @@ class RSS(Feed):
         return not time_since_published.total_seconds() <= self.published_since
 
     def _get_news(self) -> List[Any]: # TODO Refacto this
-        all_posts = Utils.sync_try_again_if_fail(
-                        self._get_feed_data,
-                        resolve_args=(self.url, 0),
-                        reject=self._exception_get_data,
-                    )
         all_posts = self._get_feed_data(self.url)
         news_to_publish: List[Any] = []
         news_to_save = news_to_publish
@@ -97,21 +93,31 @@ class RSS(Feed):
             return reversed_list_from_oldest_to_earliest
         return news_to_publish
 
-    def _get_feed_data(self, feed_url: str, retry_attempt: int = 0) -> List[Any]: # TODO Refacto this with a "try again" behaviour for is_valid_url
-        if retry_attempt <= 3:
+    def _get_feed_data(self, feed_url: str) -> List[Any]: # TODO Refacto this with a "try again" behaviour for is_valid_url
+        fail_status_code = 100
+        retry_delay = 2
+        def try_get_data():
             xml_entries = feedparser.parse(feed_url).entries
             if xml_entries != []:
                 return xml_entries
             elif self.generator_exist:
                 rss_feed = RSSGenerator(feed_url).render_xml_feed()
                 feed_parsed = feedparser.parse(rss_feed).entries
-                if feed_parsed == []:
-                    self.message.send_error(f"The RSS Generator can't generate a feed based on the URL {feed_url}")
-                return feed_parsed
+                if feed_parsed != []:
+                    return feed_parsed
+            return fail_status_code
+            
+        for attempt in range(4):
+            if attempt < 3:
+                data = try_get_data()
+                if data != fail_status_code:
+                    break
+                else:
+                    self.message.send_error(f"Fail to read {feed_url}, attempt n°{attempt} in {retry_delay} seconds")
+                    sleep(retry_delay)
             else:
-                raise Exception(f"URL: {feed_url} is not a valid url")
-        else:
-            self.is_valid_url = False
-    
-    def _exception_get_data(self, _: Exception, feed_url: str, attempt: int) -> None:
-        logger.error(f"Fail to read {feed_url}, attempt n°{attempt}")
+                self.message.send_error(f"Error with url {feed_url} after {attempt} attempt. Deleting it ...")
+                self.is_valid_url = False
+                self._close_thread()
+                return []
+        return data
