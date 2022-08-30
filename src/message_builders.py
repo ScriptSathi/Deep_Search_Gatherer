@@ -1,4 +1,6 @@
-import re, discord
+import re
+from discord import TextChannel, User, Color, Embed
+from src.registered_data import RegisteredServer
 from src.utils import Utils
 
 from html2text import HTML2Text
@@ -6,15 +8,16 @@ from html2text import HTML2Text
 from src.constants import Constants
 
 class CommandMessageBuilder:
-    def __init__(self, bot_id, content, author, channel, server) -> None:
+
+    bot_id: int
+    author: User
+    url_submited: str = "Unknown"
+    channel_submited: str = "Unknown"
+    feed_name_submited: str = ""
+
+    def __init__(self, bot_id: int, author: User) -> None:
         self.bot_id = bot_id
         self.author = author
-        self.content = content
-        self.channel = channel
-        self.server_id = server
-        self.url_submited = "Unknown"
-        self.channel_submited = "Unknown"
-        self.feed_name_submited = ""
 
     def set_data_submited(self, **options):
         self.url_submited = options.pop('url', '')
@@ -26,20 +29,20 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> you asked for deleting `{self.feed_name_submited}`",
             f"I'm trying to delete the feed, please wait"
         ])
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
-                color=discord.Color.orange()
+                color=Color.orange()
             )
 
     def build_delete_success_message(self):
         description = f"The feed has been correctly deleted\n"
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
-                color=discord.Color.green()
+                color=Color.green()
             )\
             .set_footer(text="Rest in Peace little feed 🪦")
 
@@ -52,11 +55,11 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> The submitted name `{self.feed_name_submited}` is invalid \n",
             f"<@{self.author.id}> There's no feed named: `{self.feed_name_submited}` registered\n"
         ]
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=descriptions[status],
-                color=discord.Color.red()
+                color=Color.red()
             )\
             .set_footer(text=f"Try again with a registered feed 🚨")
 
@@ -65,21 +68,21 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> you asked for adding `{self.url_submited}` in the channel `{self.channel_submited}`",
             f"I'm trying to add the feed, please wait",
         ])
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
-                color=discord.Color.orange()
+                color=Color.orange()
             )
 
     def build_add_success_message(self, feed_name):
         description = f"The feed as been correctly added with name `{feed_name}`\n" +\
             f"Next time there will be an article in the feed, it will be posted on the channel"
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
-                color=discord.Color.green()
+                color=Color.green()
             )\
             .set_footer(text="Now you just need to enjoy the news posted 📰")
 
@@ -100,11 +103,11 @@ class CommandMessageBuilder:
             "channel id",
             "url and channel id"
         ]
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=descriptions[status],
-                color=discord.Color.red()
+                color=Color.red()
             )\
             .set_footer(text=f"Try again with a valid {footers[status]} 🚨")
 
@@ -133,44 +136,44 @@ class CommandMessageBuilder:
             f"> **<@{self.bot_id}> list**"
         ])
 
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
-                color=discord.Color.orange()
+                color=Color.orange()
             )\
             .add_field(name="__Capabilites:__", value=capabilites, inline=False)\
             .add_field(name="__Examples:__", value=examples, inline=False)\
             .set_footer(text="Made with 🧡")
 
-    def build_feeds_list_message(self, server_name, server_config):
+    def build_feeds_list_message(self, reg_server: RegisteredServer):
         description = \
-            f"Here is the list of all the feeds registered on the server `{server_name}`\n"
-        feed_list = CommandBuilderUtils.get_feed_list_message(server_config)
-        return discord.Embed(
+            f"Here is the list of all the feeds registered on the server `{reg_server.name}`\n"
+        feed_list = CommandBuilderUtils.get_feed_list_message(reg_server)
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description + "\n" + feed_list,
-                color=discord.Color.orange()
+                color=Color.orange()
                 )
 
     def build_feeds_list_empty_message(self, server_name):
         description = \
             f"There is no feeds registered in the server `{server_name}` yet\n"
-        return discord.Embed(
+        return Embed(
             title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
-                color=discord.Color.orange()
+                color=Color.orange()
             )\
             .set_footer(text="Register first a feed, if you don't how to do, try the `help` command")
 
 class CommandBuilderUtils:
-    def get_feed_list_message(server_config):
+    def get_feed_list_message(server_config: RegisteredServer):
         feeds_list = ["**__Feeds:__**"]
-        for feed in server_config['feeds']:
+        for feed in server_config.feeds:
             feed_url = feed.url
-            if Utils.is_youtube_url(feed_url):
+            if Utils.is_youtube_url(feed.url):
                 feed_url = Utils.get_youtube_channel_url(feed.url)
             feeds_list.append(f"**- Name: `{feed.name}` with url: {feed_url}**")
         return CommandBuilderUtils.build_multiple_line_string(feeds_list)

@@ -1,12 +1,13 @@
+import time
 import pytz, requests, re, feedparser, random
-
+from asyncio import sleep
 from src.logger import Logger
 from src.constants import Constants
 
 logger = Logger.get_logger()
 
 class Utils:
-    def get_timezone():
+    def get_timezone() -> pytz.timezone:
         tz = 'Europe/Paris'
         try:
             timezone = pytz.timezone(tz)
@@ -14,13 +15,13 @@ class Utils:
             timezone = pytz.utc
         return timezone
 
-    def get_youtube_feed_url(url):
+    def get_youtube_feed_url(url) -> str:
         consent_cookie = {"CONSENT": "YES+"}
         html_content = Utils.get_request(url, cookies=consent_cookie).text
         line_str = re.findall(r"channel_id=([A-Za-z0-9\-\_]+)", html_content)
         return f'https://www.youtube.com/feeds/videos.xml?channel_id={line_str[0]}'
 
-    def get_youtube_channel_url(feed_url):
+    def get_youtube_channel_url(feed_url) -> str:
         return feedparser.parse(feed_url).feed['link']
 
     def is_youtube_url(url) -> bool:
@@ -29,7 +30,7 @@ class Utils:
     def is_reddit_url(url) -> bool:
         return url.startswith("https://www.reddit.com")
 
-    def is_include_in_string(include_to_test, string):
+    def is_include_in_string(include_to_test, string) -> bool:
         if isinstance(include_to_test, str) or isinstance(include_to_test, int):
             return str(include_to_test).upper() in string \
                 or str(include_to_test).lower() in string
@@ -41,13 +42,7 @@ class Utils:
                     is_include = True
             return is_include
 
-    def _message_is_empty(message_txt):
-        msg = message_txt.split()
-        if len(msg) == 1:
-            return True
-        return False
-
-    def sanitize_check(url, generator_exist):
+    def sanitize_check(url, generator_exist) -> bool:
         def try_to_reach():
             is_valid = False
             try:
@@ -68,7 +63,7 @@ class Utils:
             is_valid = try_to_reach()
         return is_valid
 
-    def is_a_valid_url(url):
+    def is_a_valid_url(url) -> bool:
         is_valid = False
         regexp = re.compile(
             r'^(?:http)s?://' # http:// or https://
@@ -88,7 +83,7 @@ class Utils:
             logger.warning(f"The submited url: {url} does not answer")
         return is_valid
 
-    def generate_random_string():
+    def generate_random_string() -> str:
         random_string = ""
         for _ in range(5):
             random_integer = random.randint(97, 97 + 26 - 1)
@@ -97,10 +92,10 @@ class Utils:
             random_string += (chr(random_integer))
         return random_string
 
-    def everyone_tag_is_not_used(message):
+    def everyone_tag_is_not_used(message) -> bool:
         return not Utils.is_include_in_string('everyone', message)
 
-    def get_request(url, **options):
+    def get_request(url, **options) -> requests.get:
         extra_cookies = options.pop('cookies', {})
         extra_headers = options.pop('headers', {})
         timeout = options.pop('timeout', 5)
@@ -113,3 +108,31 @@ class Utils:
         for key, value in extra_headers.items():
             headers[key] = value
         return requests.get(url, timeout=timeout, headers=headers, cookies=extra_cookies)
+
+    async def try_again_if_fail(resolve, max_retry=3, **args) -> None:
+        for attempt in range(max_retry):
+            try:
+                resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
+                break
+            except Exception:
+                if "reject" in args:
+                    args["reject"](Exception, *args["resolve_args"]) if "reject_args" not in args else args["reject"]()
+                if attempt < max_retry:
+                    retry_delay = 2
+                    logger.error(f"Fail, retry in {retry_delay} seconds")
+                    await sleep(retry_delay)
+                resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
+
+    def sync_try_again_if_fail(resolve, max_retry=3, **args) -> None:
+        for attempt in range(max_retry):
+            try:
+                resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
+                break
+            except Exception:
+                if "reject" in args:
+                    args["reject"](Exception, *args["resolve_args"]) if "reject_args" not in args else args["reject"]()
+                if attempt < max_retry:
+                    retry_delay = 2
+                    logger.error(f"Fail, retry in {retry_delay} seconds")
+                    time.sleep(retry_delay)
+                resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()

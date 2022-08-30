@@ -1,4 +1,3 @@
-from unicodedata import name
 import feedparser, datetime, sys
 
 from dateutil import parser

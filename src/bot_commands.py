@@ -1,5 +1,5 @@
-import discord
-
+from discord import Client, Message, Guild, TextChannel, User, Member
+from typing import Literal, Tuple, Union
 from src.utils import Utils
 from src.logger import Logger
 from src.message import CommandMessage
@@ -9,22 +9,32 @@ logger = Logger.get_logger()
 
 class BotCommands:
 
-    def __init__(self, client, context, message, generator_exist) -> None:
-        self.client: discord.Client = client
+    client: Client
+    context: Context
+    generator_exist: bool
+    author: Union[User, Member]
+    channel: TextChannel
+    server = Union[Guild, str]
+    msg_content: str 
+    message: CommandMessage
+
+    def __init__(self, client: Client, context: Context, message: Message, generator_exist: bool) -> None:
+        self.client = client
         self.context: Context = context
         self.generator_exist = generator_exist
         self.author = message.author
         self.channel = message.channel
         self.server = message.guild if "guild" in dir(message) else ""
         self.msg_content = message.content
-        self.message = CommandMessage(self.client,
+        self.message = CommandMessage(
+            self.client,
             msg_content=self.msg_content,
             author=self.author,
-            channel_obj=self.channel,
+            channel=self.channel,
             server_name=self.server.name
         )
 
-    async def handle_messages(self):
+    async def handle_messages(self) -> None:
         help_trigger, add_trigger, delete_trigger, list_trigger = (0,1,2,3)
         is_trigger = BotCommandsUtils.get_command_name(self.msg_content)
         if list_trigger == is_trigger:
@@ -43,28 +53,29 @@ class BotCommands:
         else:
             self.message.send_help(is_in_error=True)
 
-    def _handle_feeds_list(self):
-        server_config = self.context.get_server_config(self.server.id)
-        if server_config == [] or server_config['feeds'] == []:
+    def _handle_feeds_list(self) -> None:
+        reg_server = ContextUtils.get_registered_server(self.server.id, self.context.registered_data)
+        if reg_server == None or reg_server.feeds == []:
             self.message.send_feeds_list_empty(self.server.name)
         else:
-            self.message.send_feeds_list(self.server.name, server_config)
+            self.message.send_feeds_list(reg_server)
 
-    async def _handle_adding_feed(self, url_submited, channel_submited, name_submited):
+    async def _handle_adding_feed(self, url_submited: str, channel_submited: str, name_submited: str) -> None:
         url_is_valid = Utils.is_a_valid_url(url_submited)
-        channel_obj = await ContextUtils.get_channel_object(self.client, channel_submited)
+        try:
+            channel_obj = await self.client.fetch_channel(str(channel_submited))
+            url_submited = Utils.get_youtube_feed_url(url_submited) \
+                if url_submited.startswith("https://www.youtube.com") and "feeds" not in url_submited \
+                else url_submited
+        except:
+            channel_obj = None
+        chan = channel_obj.name if channel_obj != None else channel_submited
+        self.message.set_data_submited(channel=chan, url=url_submited)
+        self.message.send_add_waiting()
         if url_is_valid and channel_obj != None:
-            self.message.set_data_submited(channel=channel_obj.name, url=url_submited)
-            self.message.send_add_waiting()
             try:
-                feed_name = self.context.append_new_feed(
-                    url_submited,
-                    channel_obj,
-                    self.server.id,
-                    self.generator_exist,
-                    name_submited
-                )
-                self.message.send_add_success(feed_name, url_submited)
+                feed = self.context.add(url_submited, channel_obj, name_submited)
+                self.message.send_add_success(feed.name, feed.url)
             except:
                 self.message.send_add_error(url_in_error=True)
         elif url_is_valid and not channel_obj != None:
@@ -76,19 +87,20 @@ class BotCommands:
         else:
             self.message.send_add_error()
 
-    async def _handle_deletion_feed(self, server_id, feed_name):
+    async def _handle_deletion_feed(self, server_id: int, feed_name: str) -> None:
         self.message.set_data_submited(feed_name=feed_name)
         self.message.send_delete_waiting()
         if feed_name != '':
             try:
-                self.context.delete_from_config('name', feed_name, server_id)
+                self.context.remove(without_feed=(feed_name, server_id))
                 self.message.send_delete_success(feed_name)
             except:
+
                 self.message.send_delete_error()
         else:
             self.message.send_delete_error()
 
-    def _get_message_data(self):
+    def _get_message_data(self) -> Tuple[str, str, str]:
         url_submited = ""
         channel_submited = ""
         name_submitted = ""
@@ -111,7 +123,7 @@ class BotCommands:
         return url_submited, channel_submited, name_submitted
 
 class BotCommandsUtils:
-    def get_command_name(full_message_str):
+    def get_command_name(full_message_str) -> Union[Literal[0], Literal[1], Literal[2], Literal[100]]:
         help_trigger, add_trigger, delete_trigger, list_trigger = (0,1,2,3)
         msg = full_message_str.split()
         if len(msg) == 1 or Utils.is_include_in_string('help', msg[1]) or Utils.is_include_in_string('-h', msg[1]):
