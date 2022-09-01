@@ -4,13 +4,10 @@ from dateutil import parser
 from typing_extensions import TypedDict
 from discord import Client, TextChannel
 from abc import ABCMeta, abstractclassmethod
-from typing import Any, ClassVar, List
+from typing import Any, List
 
 from src.registered_data import RegisteredServer
 from src.message import NewsMessage
-
-from src.logger import Logger
-logger = Logger.get_logger()
 
 Feed_backup_dict = TypedDict(
         'Feed',

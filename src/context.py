@@ -1,18 +1,12 @@
-from typing_extensions import Literal
-from xml.etree.ElementInclude import include
 from discord import TextChannel, Client
 from pydash import _
-from random import randint
-from typing import Any, List, Tuple, Union
+from typing import  List, Tuple, Union
 
 from src.utils import ContextUtils
 from src.user_config import User_config_dict
 from src.generic_types import Feed
 from src.feeds_manager import FeedsManager
 from src.registered_data import RegisteredServer, RegisteredFeed
-
-from src.logger import Logger
-logger = Logger.get_logger()
 
 class Context:
 

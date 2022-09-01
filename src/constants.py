@@ -14,8 +14,6 @@ class Constants:
         'game_displayed': "Eating some RSS feeds",
         'twitter': {
             "enabled": False,
-            "api_key": "",
-            "api_key_secret": "",
             "bearer_token": "",
         },
     }

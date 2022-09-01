@@ -1,12 +1,9 @@
 from discord import Client, Message, Guild, TextChannel, User, Member
 from typing import Literal, Tuple, Union
 
-from src.utils import BotCommandsUtils, ContextUtils, FeedUtils, Utils
-from src.logger import Logger
+from src.utils import BotCommandsUtils, Utils
 from src.message import CommandMessage
 from src.context import Context
-
-logger = Logger.get_logger()
 
 class BotCommands:
 
@@ -76,11 +73,8 @@ class BotCommands:
         if link != None and channel_obj != None:
             try:
                 feed=""
-                try:
-                    feed = self.context.add(link, channel_obj, name_submited, type)
-                    self.message.send_add_success(feed.name, feed.url)
-                except:
-                    logger.exception(str(Exception))
+                feed = self.context.add(link, channel_obj, name_submited, type)
+                self.message.send_add_success(feed.name, feed.url)
             except:
                 self.message.send_add_error(url_in_error=True)
         elif link != None and not channel_obj != None:

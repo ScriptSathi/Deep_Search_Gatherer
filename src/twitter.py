@@ -1,13 +1,10 @@
 from typing import Any, List
 from discord import Client, TextChannel
-import tweepy, pprint
+import tweepy
 
 from src.user_config import User_config_dict, UserConfig
 from src.registered_data import RegisteredServer
-from src.generic_types import Feed, Feed_backup_dict
-
-from src.logger import Logger
-logger = Logger.get_logger()
+from src.generic_types import Feed
 
 class Twitter(Feed):
 
@@ -45,7 +42,7 @@ class Twitter(Feed):
             self.message.send_no_news()
         else:
             for tweet in self.news_to_publish:
-                tweet_url = f"https://www.twitter.com/{self.url}/status/{tweet.id}"
+                tweet_url = f"https://twitter.com/{self.url}/status/{tweet.id}"
                 message = f"**Author: @{self.url}**" + "\n" + tweet_url
                 self.message.send_news(message, self.type)
 

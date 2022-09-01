@@ -116,7 +116,7 @@ class FeedUtils:
         return feedparser.parse(feed_url).feed['link']
 
     def is_youtube_url(link: str) -> bool:
-        return link.startswith("https://www.youtube.com") and "feeds" not in link
+        return link.startswith("https://www.youtube.com")
 
     def is_reddit_url(link: str) -> bool:
         return link.startswith("/r/") or link.startswith("/u/")
@@ -183,7 +183,7 @@ class BotCommandsUtils:
         elif rss == type:
             is_valid = FeedUtils.is_a_valid_url(link_submited)
             if is_valid:
-                if FeedUtils.is_youtube_url(link_submited):
+                if FeedUtils.is_youtube_url(link_submited) and not "feeds" in link_submited:
                     link_submited = FeedUtils.get_youtube_feed_url(link_submited)
         if is_valid:
             return type, link_submited

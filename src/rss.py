@@ -1,11 +1,10 @@
 from discord import Client, TextChannel
-from typing import Any, Dict, List, Union
-import feedparser, sys
+from typing import Any, List
+import feedparser
 from time import sleep
 
 from src.rss_gen import RSSGenerator
-from src.utils import Utils
-from src.generic_types import Feed, Feed_backup_dict
+from src.generic_types import Feed
 from src.registered_data import RegisteredServer
 
 class RSS(Feed):

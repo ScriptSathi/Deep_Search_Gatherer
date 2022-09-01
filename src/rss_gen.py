@@ -1,5 +1,3 @@
-import requests
-
 from src.constants import Constants
 from src.logger import Logger
 from src.utils import Utils

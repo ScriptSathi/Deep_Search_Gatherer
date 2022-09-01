@@ -1,15 +1,12 @@
 import re
 from typing import Any
-from discord import TextChannel, User, Color, Embed
+from discord import User, Color, Embed
 from src.registered_data import RegisteredServer
-from src.utils import FeedUtils, Utils
+from src.utils import FeedUtils
 
 from html2text import HTML2Text
 
 from src.constants import Constants
-
-from src.logger import Logger
-logger = Logger.get_logger()
 
 class CommandMessageBuilder:
 
@@ -175,7 +172,7 @@ class CommandMessageBuilder:
 class CommandBuilderUtils:
     def get_feed_list_message(server_config: RegisteredServer):
         rss, reddit, twitter = 0, 1, 2
-        feeds_list = ["**__Feeds:__**"]
+        feeds_list = ["**__RSS and Youtube:__**"]
         twitter_list = ["**__Twitter:__**"]
         for feed in server_config.feeds:
             feed_url = feed.url
@@ -226,7 +223,7 @@ class NewsMessageBuilder:
         title = f'***{self.single_news.title}***'
         author = f'*{auth}*' if auth != '' else ''
         link = self.single_news.link
-        summary = self._parse_html() if not self._is_youtube_feed() and not FeedUtils.is_reddit_url(link) else ''
+        summary = self._parse_html() if not self._is_youtube_feed() else ''
         for field in (title, author, link, summary):
             if field != '' :
                 message += field + '\n'                

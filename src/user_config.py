@@ -15,8 +15,6 @@ User_config_dict = TypedDict(
             'game_displayed': str,
             'twitter': TypedDict('twitter',{
                 "enabled": bool,
-                "api_key": str,
-                "api_key_secret": str,
                 "bearer_token": str,
             })
         }

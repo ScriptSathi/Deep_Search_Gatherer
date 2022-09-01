@@ -8,9 +8,6 @@ from src.rss import RSS
 from src.generic_types import Feed
 from src.registered_data import RegisteredServer
 
-from src.logger import Logger
-logger = Logger.get_logger()
-
 class FeedsManager:
 
     feeds: List[List[Feed]] = [[],[],[]]

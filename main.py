@@ -29,15 +29,15 @@ class Bot(Client):
         self.loop.create_task(self._prepare_and_run())
 
     async def on_message(self, message: Message) -> None:
+        is_private_message = not getattr(message, "guild")
         if (message.author.id != self.user.id \
             and self.user.mentioned_in(message)\
             and Utils.everyone_tag_is_not_used(message.content)):
-            is_not_private_message = getattr(message, "guild")
-            if is_not_private_message:
+            if not is_private_message:
                 await BotCommands(self, self.context, message, self.generator_exist).handle_messages()
-            else:
-                logger.info(f"Private message received from {message.author.id}: {message.content}")
-                # TODO send a private message disclaimer
+        elif is_private_message:
+            logger.info(f"Private message received from {message.author.id}: {message.content}")
+            # TODO send a private message disclaimer
 
     async def _prepare_and_run(self) -> None:
         await self.wait_until_ready()
