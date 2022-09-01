@@ -36,7 +36,6 @@ class Message:
         news = options.pop('news', '')
         msg_content = options.pop('msg_content', '')
         author = options.pop('author', '')
-
         for channel in self.channels:
             server_name: str = channel.guild.name
             server_id: int = channel.guild.id

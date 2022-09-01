@@ -203,20 +203,18 @@ class NewsMessageBuilder:
     
     def __init__(self, single_news: Any) -> None:
         self.single_news = single_news
-    
+
     def build_message(self, type: int) -> str:
         rss, reddit, twitter = 0, 1, 2
 
         if type == rss:
             return self._render_rss_message()
-        elif type == reddit:
-            pass
-        elif type == twitter:
-            return self._render_twitter_message()
-        
-    def _render_twitter_message(self) -> str:
+        elif type == reddit or type == twitter:
+            return self._render_twitter_and_reddit_message()
+
+    def _render_twitter_and_reddit_message(self) -> str:
         return self.single_news
-    
+
     def _render_rss_message(self) -> str:
         auth = self._render_author()
         message = ''

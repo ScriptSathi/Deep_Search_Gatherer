@@ -63,6 +63,10 @@ class AFeed(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
+    def _get_news(self) -> None:
+        pass
+
+    @abstractclassmethod
     def _send_news(self) -> None:
         pass
 

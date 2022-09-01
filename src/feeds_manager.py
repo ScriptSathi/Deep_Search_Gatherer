@@ -1,6 +1,10 @@
+from tweepy import Client as Twitter_Client
 from discord import TextChannel, Client
 from typing import Dict, List, Union
 from pydash import _
+from praw import Reddit as Reddit_Client
+
+from src.reddit import Reddit
 from src.user_config import User_config_dict
 from src.utils import FeedUtils
 from src.twitter import Twitter
@@ -28,7 +32,8 @@ class FeedsManager:
         uid: int,
         generator_exist: bool,
         last_post: str,
-        user_config: User_config_dict
+        twitter_client: Twitter_Client,
+        reddit_client: Reddit_Client,
     ) -> Feed:
         rss, reddit, twitter = 0, 1, 2
         feed: Feed
@@ -37,11 +42,13 @@ class FeedsManager:
                 name = FeedUtils.find_rss_feed_name(url)
             feed = RSS(client, [channel], name, url, server_on, uid, generator_exist, last_post, type)
         elif type == reddit:
-            pass
+            if name == "":
+                name = FeedUtils.find_reddit_feed_name(url)
+            feed = Reddit(client, [channel], name, url, server_on, uid, generator_exist, last_post, type, reddit_client)
         elif type == twitter:
             if name == "":
-                name = FeedUtils.find_twitter_feed_name(url, user_config["twitter"]["bearer_token"])
-            feed = Twitter(client, [channel], name, url, server_on, uid, generator_exist, last_post, type)
+                name = FeedUtils.find_twitter_feed_name(url, twitter_client)
+            feed = Twitter(client, [channel], name, url, server_on, uid, generator_exist, last_post, type, twitter_client)
         return feed
 
     def get_feed_backup(self, server_id: int, type: int, classvar_name: str, classvar_value: Union[str, int]) -> Dict[str, Union[str, int]]:

@@ -1,8 +1,10 @@
+from tweepy import Client as Twitter_Client
+from praw import Reddit as Reddit_Client
 from discord import TextChannel, Client
 from pydash import _
 from typing import  List, Tuple, Union
 
-from src.utils import ContextUtils
+from src.utils import ContextUtils, Utils
 from src.user_config import User_config_dict
 from src.generic_types import Feed
 from src.feeds_manager import FeedsManager
@@ -15,11 +17,21 @@ class Context:
     manager: FeedsManager = FeedsManager()
     user_config: User_config_dict
     generator_exist: bool
+    twitter_client: Twitter_Client
+    reddit_client: Reddit_Client
 
     def __init__(self, client: Client, generator_exist: bool, user_config: User_config_dict) -> None:
         self.client = client
         self.generator_exist = generator_exist
         self.user_config = user_config
+        self.twitter_client = Twitter_Client(bearer_token=user_config["twitter"]["bearer_token"])
+        self.reddit_client = Reddit_Client(
+                client_id=user_config["reddit"]["client_id"],
+                client_secret=user_config["reddit"]["client_secret"],
+                password=user_config["reddit"]["password"],
+                user_agent=Utils.get_user_agent(),
+                username=user_config["reddit"]["username"],
+            )
 
     def add(self, link: str, channel: TextChannel, name: str, type, last_post: str = "") -> Feed:
         server = self.get_registered_server(channel.guild.id)
@@ -30,7 +42,8 @@ class Context:
         if feed == None:
             uid = ContextUtils.create_uid(10)
             feed = self.manager.create_feed(
-                type, self.client, channel, name, link, server, uid, self.generator_exist, last_post, self.user_config
+                type, self.client, channel, name, link, server, uid, self.generator_exist, last_post,
+                self.twitter_client, self.reddit_client
                 )
             self.manager.append_feed(type, feed)
             server.feeds.append(RegisteredFeed(uid, type, feed.name, link, channel.id))

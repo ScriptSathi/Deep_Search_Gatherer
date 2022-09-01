@@ -16,7 +16,14 @@ User_config_dict = TypedDict(
             'twitter': TypedDict('twitter',{
                 "enabled": bool,
                 "bearer_token": str,
-            })
+            }),
+            'reddit': TypedDict('reddit',{
+                "enabled": bool,
+                "client_id": str,
+                "client_secret":str,
+                "password": str,
+                "username": str,
+            }),
         }
     )
 

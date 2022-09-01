@@ -62,9 +62,7 @@ class Utils:
         extra_headers = options.pop('headers', {})
         timeout = options.pop('timeout', 5)
         headers = {
-            "User-Agent": f"Mozilla/5.0 - This is a bot from this project {Constants.source_code_url}."
-                + "Please do not ban me. It has been build to help following content using RSS feeds."
-                + f"The purpose is only to gather informations every {Constants.base_config_default['refresh_time']} seconds",
+            "User-Agent": Utils.get_user_agent(),
             "Retry-After": "5",
             }
         for key, value in extra_headers.items():
@@ -84,6 +82,13 @@ class Utils:
                     logger.error(f"Fail, retry in {retry_delay} seconds")
                     await sleep(retry_delay)
                 resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
+
+    def get_user_agent(reddit_username: str = None):
+        reddit_msg = "" if reddit_username == None else f"My Reddit account is u/{reddit_username}" 
+        return (f"Mozilla/5.0 - {reddit_msg} This is a bot from this project {Constants.source_code_url}."
+            + "Please do not ban me. It has been build to help following updates from feeds."
+            + f"The purpose is only to gather informations every {Constants.base_config_default['refresh_time']} seconds."
+            + f"This is an fully open-source project")
 
 class FeedUtils:
     def is_a_valid_url(url: str) -> bool:
@@ -119,7 +124,9 @@ class FeedUtils:
         return link.startswith("https://www.youtube.com")
 
     def is_reddit_url(link: str) -> bool:
-        return link.startswith("/r/") or link.startswith("/u/")
+        return link.startswith("/r/") or link.startswith("r/")
+            # or link.startswith("/u/") or link.startswith("u/") \
+            # or link.startswith("user/") or link.startswith("/user/")
 
     def is_twitter_link(link: str) -> bool:
         return link.startswith("@")
@@ -130,14 +137,25 @@ class FeedUtils:
         except Exception:
             return False
 
+    def is_subreddit_exist(subreddit_name: str, ) -> bool:
+        try:
+            return Utils.get_request(f'https://www.reddit.com/r/{subreddit_name}').status_code == 200
+        except Exception:
+            return False
+
     def find_rss_feed_name(url: str) -> str:
         data = feedparser.parse(url)
         name = data.feed['title'] if "title" in data.feed else f"feed-{Utils.generate_random_string()}"
         return name.replace(" ", "-")
 
-    def find_twitter_feed_name(user: str, bearer_token: str) -> str:
-        name = tweepy.Client(bearer_token=bearer_token).get_user(username=user).data.name
+    def find_twitter_feed_name(user: str, client: tweepy.Client) -> str:
+        name = client.get_user(username=user).data.name
         return name.replace(" ", "-")
+
+    def find_reddit_feed_name(subreddit_name: str) -> str:
+        subreddit_name = _.replace_start(subreddit_name, "/", "")
+        subreddit_name = _.replace_start(subreddit_name, "r/", "")
+        return subreddit_name
 
 class ContextUtils:
 
@@ -176,7 +194,8 @@ class BotCommandsUtils:
         type = ContextUtils.get_type(link_submited)
         is_valid = False
         if reddit == type:
-            logger.info("Reddit asked, skip")
+            link_submited = FeedUtils.find_reddit_feed_name(link_submited)
+            is_valid = FeedUtils.is_subreddit_exist(link_submited)
         elif twitter == type:
             link_submited = _.replace_start(link_submited, "@", "")
             is_valid = FeedUtils.is_twitter_user_exist(link_submited, bearer_token)
