@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 import discord
 from src.registered_data import RegisteredServer
 from src.message_builders import NewsMessageBuilder, CommandMessageBuilder
@@ -45,7 +45,7 @@ class Message:
                 if no_news:
                     logger.info(f"{base_message} - {self.feed_name} - No news to share")
                 else:
-                    logger.info(f'{base_message} - {self.feed_name} - Publishing on channel "{channel.name}" - "{news.title}"')
+                    logger.info(f'{base_message} - {self.feed_name} - Publishing on channel "{channel.name}" - "{news}"')
             elif add != {}:
                 logger.info(f"{base_message} - Successfully adding {add['name']} with url {add['url']}")
             elif delete != {}:
@@ -57,8 +57,8 @@ class NewsMessage(Message):
     def __init__(self, client: discord.Client, channels: List[discord.TextChannel], feed_name: str) -> None:
         super().__init__(client, channels, feed_name, is_a_news=True)
 
-    def send_news(self, news):
-        message = NewsMessageBuilder(news).build_message()
+    def send_news(self, news: Any, type: int):
+        message = NewsMessageBuilder(news).build_message(type)
         self._send_stdout(news=news)
         self._send_discord(message)
 

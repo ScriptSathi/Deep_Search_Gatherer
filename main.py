@@ -25,7 +25,7 @@ class Bot(Client):
     async def on_ready(self) -> None:
         logger.info(f'Logged in as {self.user} (ID: {self.user.id})')
         logger.info('------')
-        self.context = await Backup.load(self, self.generator_exist)
+        self.context = await Backup.load(self, self.generator_exist, user_config)
         self.loop.create_task(self._prepare_and_run())
 
     async def on_message(self, message: Message) -> None:

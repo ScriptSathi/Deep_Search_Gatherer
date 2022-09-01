@@ -9,9 +9,14 @@ class Constants:
     backup_path = os.path.join(backup_dir_path, 'backup.yaml')
     base_config_default = {
         "token": "",
-        "servers": [],
         "published_since_default": 0,
         "refresh_time": 900,
         'game_displayed': "Eating some RSS feeds",
+        'twitter': {
+            "enabled": False,
+            "api_key": "",
+            "api_key_secret": "",
+            "bearer_token": "",
+        },
     }
     api_url = "http://scrape2rss:9292"

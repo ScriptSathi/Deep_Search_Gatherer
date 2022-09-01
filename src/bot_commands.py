@@ -1,9 +1,10 @@
 from discord import Client, Message, Guild, TextChannel, User, Member
 from typing import Literal, Tuple, Union
-from src.utils import Utils
+
+from src.utils import BotCommandsUtils, ContextUtils, FeedUtils, Utils
 from src.logger import Logger
 from src.message import CommandMessage
-from src.context import ContextUtils, Context
+from src.context import Context
 
 logger = Logger.get_logger()
 
@@ -54,35 +55,39 @@ class BotCommands:
             self.message.send_help(is_in_error=True)
 
     def _handle_feeds_list(self) -> None:
-        reg_server = ContextUtils.get_registered_server(self.server.id, self.context.registered_data)
+        reg_server = self.context.get_registered_server(self.server.id)
         if reg_server == None or reg_server.feeds == []:
             self.message.send_feeds_list_empty(self.server.name)
         else:
             self.message.send_feeds_list(reg_server)
 
-    async def _handle_adding_feed(self, url_submited: str, channel_submited: str, name_submited: str) -> None:
-        url_is_valid = Utils.is_a_valid_url(url_submited)
+    async def _handle_adding_feed(self, link_submited: str, channel_submited: str, name_submited: str) -> None:
+        type, link = BotCommandsUtils.check_link_and_return(
+            link_submited, 
+            self.context.user_config["twitter"]["bearer_token"]
+        )
         try:
             channel_obj = await self.client.fetch_channel(str(channel_submited))
-            url_submited = Utils.get_youtube_feed_url(url_submited) \
-                if url_submited.startswith("https://www.youtube.com") and "feeds" not in url_submited \
-                else url_submited
         except:
             channel_obj = None
-        chan = channel_obj.name if channel_obj != None else channel_submited
-        self.message.set_data_submited(channel=chan, url=url_submited)
+        chan_name = channel_obj.name if channel_obj != None else channel_submited
+        self.message.set_data_submited(channel=chan_name, link=link)
         self.message.send_add_waiting()
-        if url_is_valid and channel_obj != None:
+        if link != None and channel_obj != None:
             try:
-                feed = self.context.add(url_submited, channel_obj, name_submited)
-                self.message.send_add_success(feed.name, feed.url)
+                feed=""
+                try:
+                    feed = self.context.add(link, channel_obj, name_submited, type)
+                    self.message.send_add_success(feed.name, feed.url)
+                except:
+                    logger.exception(str(Exception))
             except:
                 self.message.send_add_error(url_in_error=True)
-        elif url_is_valid and not channel_obj != None:
-            self.message.set_data_submited(channel=channel_submited, url=url_submited)
+        elif link != None and not channel_obj != None:
+            self.message.set_data_submited(channel=channel_submited, link=link)
             self.message.send_add_error(channel_in_error=True)
-        elif not url_is_valid and channel_obj != None:
-            self.message.set_data_submited(channel=channel_obj.name, url=url_submited)
+        elif link == None and channel_obj != None:
+            self.message.set_data_submited(channel=channel_obj.name, link=link)
             self.message.send_add_error(url_in_error=True)
         else:
             self.message.send_add_error()
@@ -121,18 +126,3 @@ class BotCommands:
                 elif Utils.is_include_in_string(["delete", "dl", "del"], elem):
                     name_submitted = user_cmd[i+1]
         return url_submited, channel_submited, name_submitted
-
-class BotCommandsUtils:
-    def get_command_name(full_message_str) -> Union[Literal[0], Literal[1], Literal[2], Literal[100]]:
-        help_trigger, add_trigger, delete_trigger, list_trigger = (0,1,2,3)
-        msg = full_message_str.split()
-        if len(msg) == 1 or Utils.is_include_in_string('help', msg[1]) or Utils.is_include_in_string('-h', msg[1]):
-            return help_trigger
-        elif Utils.is_include_in_string('add', msg[1]):
-            return add_trigger
-        elif Utils.is_include_in_string('delete', msg[1]) or Utils.is_include_in_string('del', msg[1]):
-            return delete_trigger
-        elif Utils.is_include_in_string('list', msg[1]) or Utils.is_include_in_string('ls', msg[1]):
-            return list_trigger
-        else:
-            return 100

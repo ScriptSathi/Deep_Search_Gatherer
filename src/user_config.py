@@ -1,12 +1,29 @@
 import os, json, yaml
+from typing import Any, TypedDict
 
 from src.constants import Constants
 from src.logger import Logger
 
 logger = Logger.get_logger()
 
+User_config_dict = TypedDict(
+        'UserConfig',
+        {
+            "token": str,
+            "published_since_default": int,
+            "refresh_time": int,
+            'game_displayed': str,
+            'twitter': TypedDict('twitter',{
+                "enabled": bool,
+                "api_key": str,
+                "api_key_secret": str,
+                "bearer_token": str,
+            })
+        }
+    )
+
 class UserConfig:
-    def load_user_config():
+    def load_user_config() -> User_config_dict:
         config_path = os.path.join(Constants.base_conf_path_dir, UserConfig.file_name())
         base_config = UserConfig.read_config_file(config_path)
         config = Constants.base_config_default

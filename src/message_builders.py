@@ -1,18 +1,21 @@
 import re
+from typing import Any
 from discord import TextChannel, User, Color, Embed
-from src.rss import RSS
 from src.registered_data import RegisteredServer
-from src.utils import Utils
+from src.utils import FeedUtils, Utils
 
 from html2text import HTML2Text
 
 from src.constants import Constants
 
+from src.logger import Logger
+logger = Logger.get_logger()
+
 class CommandMessageBuilder:
 
     bot_id: int
     author: User
-    url_submited: str = "Unknown"
+    link_submited: str = "Unknown"
     channel_submited: str = "Unknown"
     feed_name_submited: str = ""
 
@@ -21,7 +24,7 @@ class CommandMessageBuilder:
         self.author = author
 
     def set_data_submited(self, **options):
-        self.url_submited = options.pop('url', '')
+        self.link_submited = options.pop('link', '')
         self.channel_submited = options.pop('channel', '')
         self.feed_name_submited = options.pop('feed_name', '')
 
@@ -66,7 +69,7 @@ class CommandMessageBuilder:
 
     def build_add_waiting_message(self):
         description = CommandBuilderUtils.build_multiple_line_string([
-            f"<@{self.author.id}> you asked for adding `{self.url_submited}` in the channel `{self.channel_submited}`",
+            f"<@{self.author.id}> you asked for adding `{self.link_submited}` in the channel `{self.channel_submited}`",
             f"I'm trying to add the feed, please wait",
         ])
         return Embed(
@@ -95,14 +98,14 @@ class CommandMessageBuilder:
         elif channel_in_error: status = 1
         else: status = 2
         descriptions = [
-            f"<@{self.author.id}> an error occured with the url `{self.url_submited}` for the channel `{self.channel_submited}`\n",
+            f"<@{self.author.id}> an error occured with the link `{self.link_submited}` for the channel `{self.channel_submited}`\n",
             f"<@{self.author.id}> an error occured on the submited channel `{self.channel_submited}`\n",
-            f"<@{self.author.id}> an error occured with the url `{self.url_submited}` and the channel `{self.channel_submited}`\n",
+            f"<@{self.author.id}> an error occured with the link `{self.link_submited}` and the channel `{self.channel_submited}`\n",
         ]
         footers = [
-            "url",
+            "link",
             "channel id",
-            "url and channel id"
+            "link and channel id"
         ]
         return Embed(
             title=Constants.bot_name,
@@ -132,7 +135,7 @@ class CommandMessageBuilder:
         ])
 
         examples = CommandBuilderUtils.build_multiple_line_string([
-            f"> **<@{self.bot_id}> add <url_to_follow> channel <channel_id> (name <feed_name>)**",
+            f"> **<@{self.bot_id}> add <link_to_follow> channel <channel_id> (name <feed_name>)**",
             f"> **<@{self.bot_id}> delete <feed_name>**",
             f"> **<@{self.bot_id}> list**"
         ])
@@ -171,34 +174,59 @@ class CommandMessageBuilder:
 
 class CommandBuilderUtils:
     def get_feed_list_message(server_config: RegisteredServer):
+        rss, reddit, twitter = 0, 1, 2
         feeds_list = ["**__Feeds:__**"]
+        twitter_list = ["**__Twitter:__**"]
         for feed in server_config.feeds:
             feed_url = feed.url
-            if Utils.is_youtube_url(feed.url):
-                feed_url = RSS.get_youtube_channel_url(feed.url)
-            feeds_list.append(f"**- Name: `{feed.name}` with url: {feed_url}**")
-        return CommandBuilderUtils.build_multiple_line_string(feeds_list)
+            if feed.type == rss:
+                if FeedUtils.is_youtube_url(feed.url):
+                    feed_url = FeedUtils.get_youtube_channel_url(feed.url)
+                feeds_list.append(f"**- Name: `{feed.name}` with url: {feed_url}**")
+            elif feed.type == reddit:
+                pass
+            elif feed.type == twitter:
+                twitter_list.append(f"**- Name: `{feed.name}` for account @{feed_url}**")
+        feeds_list = feeds_list if len(feeds_list) > 1 else []
+        twitter_list = twitter_list if len(twitter_list) > 1 else []
+        return CommandBuilderUtils.build_multiple_line_string(feeds_list, twitter_list)
 
-    def build_multiple_line_string(array_of_messages):
+    def build_multiple_line_string(*args):
         output_msg = ""
-        for i, msg in enumerate(array_of_messages):
-            output_msg += msg
-            if i <  len(array_of_messages) - 1:
-                output_msg += "\n"
+        for array_of_messages in args:
+            for i, msg in enumerate(array_of_messages):
+                output_msg += msg
+                if i <  len(array_of_messages) - 1:
+                    output_msg += "\n"
+            if array_of_messages != []:
+                output_msg += "\n\n"
         return output_msg
 
 class NewsMessageBuilder:
     
-    def __init__(self, single_news) -> None:
+    def __init__(self, single_news: Any) -> None:
         self.single_news = single_news
     
-    def build_message(self):
+    def build_message(self, type: int) -> str:
+        rss, reddit, twitter = 0, 1, 2
+
+        if type == rss:
+            return self._render_rss_message()
+        elif type == reddit:
+            pass
+        elif type == twitter:
+            return self._render_twitter_message()
+        
+    def _render_twitter_message(self) -> str:
+        return self.single_news
+    
+    def _render_rss_message(self) -> str:
         auth = self._render_author()
         message = ''
         title = f'***{self.single_news.title}***'
         author = f'*{auth}*' if auth != '' else ''
         link = self.single_news.link
-        summary = self._parse_html() if not self._is_youtube_feed() and not Utils.is_reddit_url(link) else ''
+        summary = self._parse_html() if not self._is_youtube_feed() and not FeedUtils.is_reddit_url(link) else ''
         for field in (title, author, link, summary):
             if field != '' :
                 message += field + '\n'                

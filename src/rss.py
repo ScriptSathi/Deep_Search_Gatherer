@@ -1,25 +1,14 @@
 from discord import Client, TextChannel
 from typing import Any, Dict, List, Union
-import feedparser, datetime, sys
+import feedparser, sys
 from time import sleep
 
-from dateutil import parser
-
 from src.rss_gen import RSSGenerator
-from src.message import NewsMessage
 from src.utils import Utils
 from src.generic_types import Feed, Feed_backup_dict
 from src.registered_data import RegisteredServer
 
 class RSS(Feed):
-
-    def find_feed_name(url: str):
-        data = feedparser.parse(url)
-        name = data.feed['title'] if "title" in data.feed else f"feed-{Utils.generate_random_string()}"
-        return name.replace(" ", "-")
-
-    def get_youtube_channel_url(feed_url) -> str:
-        return feedparser.parse(feed_url).feed['link']
 
     def __init__(self,
         client: Client,
@@ -29,45 +18,26 @@ class RSS(Feed):
         server_on: RegisteredServer,
         uid: int,
         generator_exist: bool,
-        last_post: str
+        last_post: str,
+        type: int
     ) -> None:
-        super().__init__(client, channels, name, url, server_on, uid, generator_exist, last_post)
-        self.published_since = 0
+        super().__init__(client, channels, name, url, server_on, uid, generator_exist, last_post, type)
 
     def run(self) -> None:
         self.news_to_publish = self._get_news()
         self._send_news()
         self._close_thread()
 
-    def get_feed_backup(self, server_id: int) -> Feed_backup_dict:
-        return {
-            "name": self.name,
-            "url": self.url,
-            "last_post": self.last_post,
-            "channels": [channel.id for channel in self.channels if channel.guild.id == server_id],
-        }
-
     def _send_news(self) -> None:
         if self.news_to_publish == []:
             self.message.send_no_news()
         else:
-            for new_post in self.news_to_publish: 
-                self.message.send_news(new_post)
+            for new_post in self.news_to_publish:
+                self.message.send_news(new_post.title, self.type)
 
-    def _register_latest_post(self, news_to_save):
+    def _register_latest_post(self, news_to_save: List[Any]) -> None:
         if news_to_save != []:
             self.last_post = news_to_save[0].title
-
-    def _close_thread(self) -> None:
-        sys.exit()
-
-    def _is_too_old_news(self, single_news) -> bool:
-        date_time = parser.parse(single_news['published'])
-        timezone = Utils.get_timezone()
-        time_since_published = timezone.localize(
-            datetime.datetime.now()
-        ) - date_time.astimezone(timezone)
-        return not time_since_published.total_seconds() <= self.published_since
 
     def _get_news(self) -> List[Any]: # TODO Refacto this
         all_posts = self._get_feed_data(self.url)
@@ -85,7 +55,7 @@ class RSS(Feed):
                     news_to_save = [all_posts[0]]
                 else:
                     for single_news in all_posts:
-                        if self._is_too_old_news(single_news):
+                        if self._is_too_old_news(single_news['published'], True):
                             break
                         news_to_publish.append(single_news)
             self._register_latest_post(news_to_save)

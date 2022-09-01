@@ -1,9 +1,15 @@
 from discord import TextChannel, Client
 from typing import Dict, List, Union
 from pydash import _
+from src.user_config import User_config_dict
+from src.utils import FeedUtils
+from src.twitter import Twitter
 from src.rss import RSS
 from src.generic_types import Feed
 from src.registered_data import RegisteredServer
+
+from src.logger import Logger
+logger = Logger.get_logger()
 
 class FeedsManager:
 
@@ -24,18 +30,21 @@ class FeedsManager:
         server_on: RegisteredServer,
         uid: int,
         generator_exist: bool,
-        last_post: str
+        last_post: str,
+        user_config: User_config_dict
     ) -> Feed:
         rss, reddit, twitter = 0, 1, 2
         feed: Feed
         if type == rss:
             if name == "":
-                name = RSS.find_feed_name(url)
-            feed = RSS(client, [channel], name, url, server_on, uid, generator_exist, last_post)
+                name = FeedUtils.find_rss_feed_name(url)
+            feed = RSS(client, [channel], name, url, server_on, uid, generator_exist, last_post, type)
         elif type == reddit:
             pass
         elif type == twitter:
-            pass
+            if name == "":
+                name = FeedUtils.find_twitter_feed_name(url, user_config["twitter"]["bearer_token"])
+            feed = Twitter(client, [channel], name, url, server_on, uid, generator_exist, last_post, type)
         return feed
 
     def get_feed_backup(self, server_id: int, type: int, classvar_name: str, classvar_value: Union[str, int]) -> Dict[str, Union[str, int]]:

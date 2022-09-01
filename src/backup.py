@@ -1,6 +1,7 @@
 import os, yaml
 from typing import List
 from discord import Client, TextChannel
+from src.user_config import User_config_dict
 from src.message import Message
 
 from src.constants import Constants
@@ -11,8 +12,8 @@ logger = Logger.get_logger()
 
 class Backup:
 
-    async def load(client: Client, generator_exist: bool) -> Context:
-        context = Context(client, generator_exist)
+    async def load(client: Client, generator_exist: bool, user_config: User_config_dict) -> Context:
+        context = Context(client, generator_exist, user_config)
         try:
             with open(Constants.backup_path, 'r') as yaml_file:
                 backup_data = yaml.safe_load(yaml_file)['servers']
@@ -26,10 +27,11 @@ class Backup:
                                 base_message = Message.standard_output(server_data["name"], server_data['id'])
                                 logger.warning(f"{base_message} - Channel {str(channel_id)} does not exist, skipping")
                         for channel in feed_channels:
-                            context.add(feed_data['url'], channel, feed_data['name'], feed_data['last_post'])
+                            context.add(feed_data['url'], channel, feed_data['name'], feed_data['type'], feed_data['last_post'])
             logger.info('Backup loaded successfully')
             return context
         except:
+            logger.error('Fail to load backup')
             return context
 
     context: Context
