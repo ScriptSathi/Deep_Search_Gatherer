@@ -6,7 +6,7 @@ from typing import  List, Tuple, Union
 
 from src.utils import ContextUtils, Utils
 from src.user_config import User_config_dict
-from src.generic_types import Feed
+from src.Feed import Feed
 from src.feeds_manager import FeedsManager
 from src.registered_data import RegisteredServer, RegisteredFeed
 

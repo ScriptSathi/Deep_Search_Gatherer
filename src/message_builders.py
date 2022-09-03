@@ -1,11 +1,10 @@
+from collections import namedtuple
+from dataclasses import dataclass
 import re
 from typing import Any
 from discord import User, Color, Embed
 from src.registered_data import RegisteredServer
 from src.utils import FeedUtils
-
-from html2text import HTML2Text
-
 from src.constants import Constants
 
 class CommandMessageBuilder:
@@ -199,9 +198,19 @@ class CommandBuilderUtils:
                 output_msg += "\n\n"
         return output_msg
 
+@dataclass(frozen=True)
+class PostMessage:
+    title: str
+    content: str
+    link: str
+    author: str = 'Unknow Author'
+    sec_link: str = ""
+
 class NewsMessageBuilder:
-    
-    def __init__(self, single_news: Any) -> None:
+
+    single_news: PostMessage
+
+    def __init__(self, single_news: PostMessage) -> None:
         self.single_news = single_news
 
     def build_message(self, type: int) -> str:
@@ -209,50 +218,25 @@ class NewsMessageBuilder:
 
         if type == rss:
             return self._render_rss_message()
-        elif type == reddit or type == twitter:
-            return self._render_twitter_and_reddit_message()
+        if type == reddit:
+            return self._render_reddit_message()
+        elif type == twitter:
+            return self._render_twitter_message()
 
-    def _render_twitter_and_reddit_message(self) -> str:
-        return self.single_news
+    def _render_twitter_message(self) -> str:
+        return f"**{self.single_news.author}** {self.single_news.content}"
+
+    def _render_reddit_message(self) -> str:
+        link = "" if self.single_news.link == "" else f"\n- The submitted link by the user -\n{self.single_news.link}"
+        return (f"**{self.single_news.title}**" + link
+            + "\n" + f"- View the reddit post -\n{self.single_news.sec_link}")
 
     def _render_rss_message(self) -> str:
-        auth = self._render_author()
         message = ''
-        title = f'***{self.single_news.title}***'
-        author = f'*{auth}*' if auth != '' else ''
-        link = self.single_news.link
-        summary = self._parse_html() if not self._is_youtube_feed() else ''
-        for field in (title, author, link, summary):
+        for field in (
+            f'***{self.single_news.title}***',
+            f'*{self.single_news.author}*' if self.single_news.author != '' else '',
+            self.single_news.link, self.single_news.content):
             if field != '' :
-                message += field + '\n'                
+                message += field + '\n'
         return message
-
-    def _parse_html(self): 
-        htmlfixer = HTML2Text()
-        htmlfixer.ignore_links = True
-        htmlfixer.ignore_images = True
-        htmlfixer.ignore_emphasis = False
-        htmlfixer.body_width = 1000
-        htmlfixer.ul_item_mark = "-" 
-        markdownfield = htmlfixer.handle(self.single_news.summary)
-        return re.sub("<[^<]+?>", "", markdownfield)
-
-    def _render_author(self):
-        if 'authors' or 'author' in self.single_news:
-            if 'authors' in self.single_news:
-                if self.single_news['authors'][0] == {}:
-                    return "Unknow authors"
-                else:
-                    str_authors = 'Author: '
-                    if len(self.single_news['authors']) == 1:
-                        str_authors += (self.single_news['authors'][0]).name
-                    else:
-                        for author in self.single_news['authors']:
-                            str_authors += author.name + ', '
-                    return str_authors
-            elif 'author' in self.single_news:
-                return "Unknow author" if self.single_news['author'] == {} else self.single_news['author'].name
-        return ''
-
-    def _is_youtube_feed(self):
-        return 'yt_videoid' in self.single_news

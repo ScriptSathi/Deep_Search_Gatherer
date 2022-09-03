@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Union
 import discord
 from src.registered_data import RegisteredServer
-from src.message_builders import NewsMessageBuilder, CommandMessageBuilder
+from src.message_builders import NewsMessageBuilder, CommandMessageBuilder, PostMessage
 from src.logger import Logger
 
 logger = Logger.get_logger()
@@ -56,9 +56,9 @@ class NewsMessage(Message):
     def __init__(self, client: discord.Client, channels: List[discord.TextChannel], feed_name: str) -> None:
         super().__init__(client, channels, feed_name, is_a_news=True)
 
-    def send_news(self, news: Any, type: int):
+    def send_news(self, news: PostMessage, type: int):
         message = NewsMessageBuilder(news).build_message(type)
-        self._send_stdout(news=news)
+        self._send_stdout(news=news.title)
         self._send_discord(message)
 
     def send_no_news(self):

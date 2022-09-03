@@ -9,7 +9,7 @@ from src.user_config import User_config_dict
 from src.utils import FeedUtils
 from src.twitter import Twitter
 from src.rss import RSS
-from src.generic_types import Feed
+from src.Feed import Feed
 from src.registered_data import RegisteredServer
 
 class FeedsManager:

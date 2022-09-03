@@ -2,9 +2,12 @@ from discord import Client, TextChannel
 from typing import Any, List
 import feedparser
 from time import sleep
+from html2text import HTML2Text
+from re import sub
 
+from src.message_builders import PostMessage
 from src.rss_gen import RSSGenerator
-from src.generic_types import Feed
+from src.Feed import Feed
 from src.registered_data import RegisteredServer
 
 class RSS(Feed):
@@ -32,7 +35,12 @@ class RSS(Feed):
             self.message.send_no_news()
         else:
             for new_post in self.news_to_publish:
-                self.message.send_news(new_post.title, self.type)
+                self.message.send_news(PostMessage(
+                    new_post.title,
+                    self._parse_html(new_post) if not self._is_youtube_feed(new_post) else '',
+                    new_post.link,
+                    self._render_author(new_post),
+                ), self.type)
 
     def _register_latest_post(self, news_to_save: List[Any]) -> None:
         if news_to_save != []:
@@ -90,3 +98,33 @@ class RSS(Feed):
                 self._close_thread()
                 return []
         return data
+
+    def _render_author(self, new_post):
+        if 'authors' or 'author' in new_post:
+            if 'authors' in new_post:
+                if new_post['authors'][0] == {}:
+                    return "Unknow authors"
+                else:
+                    str_authors = 'Author: '
+                    if len(new_post['authors']) == 1:
+                        str_authors += (new_post['authors'][0]).name
+                    else:
+                        for author in new_post['authors']:
+                            str_authors += author.name + ', '
+                    return str_authors
+            elif 'author' in new_post:
+                return "Unknow author" if new_post['author'] == {} else new_post['author'].name
+        return ''
+
+    def _parse_html(self, new_post): 
+        htmlfixer: HTML2Text = HTML2Text()
+        htmlfixer.ignore_links = True
+        htmlfixer.ignore_images = True
+        htmlfixer.ignore_emphasis = False
+        htmlfixer.body_width = 1000
+        htmlfixer.ul_item_mark = "-" 
+        markdownfield = htmlfixer.handle(new_post.summary)
+        return sub("<[^<]+?>", "", markdownfield)
+
+    def _is_youtube_feed(self, new_post):
+        return 'yt_videoid' in new_post

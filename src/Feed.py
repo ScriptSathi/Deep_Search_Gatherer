@@ -19,7 +19,7 @@ Feed_backup_dict = TypedDict(
         }
     )
 
-class AFeed(metaclass=ABCMeta):
+class Feed:
 
     client: Client
     channels: List[TextChannel]
@@ -58,36 +58,14 @@ class AFeed(metaclass=ABCMeta):
         self.type = type
         self.message = NewsMessage(client, channels, name)
 
-    @abstractclassmethod
     def run(self) -> None:
         pass
 
-    @abstractclassmethod
     def _get_news(self) -> None:
         pass
 
-    @abstractclassmethod
     def _send_news(self) -> None:
         pass
-
-    @abstractclassmethod
-    def _close_thread(self) -> None:
-        pass
-
-class Feed(AFeed):
-
-    def __init__(self,
-            client: Client,
-            channels: List[TextChannel], 
-            name: str,
-            url: str,
-            server_on: RegisteredServer,
-            uid: int,
-            generator_exist: bool,
-            last_post: str,
-            type: int
-    ) -> None: 
-        super().__init__(client, channels, name, url, server_on, uid, generator_exist, last_post, type)
 
     def get_feed_backup(self, server_id: int) -> Feed_backup_dict:
         return {

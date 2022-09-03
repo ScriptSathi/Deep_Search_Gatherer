@@ -8,7 +8,7 @@ from src.logger import Logger
 from src.context import Context
 from src.rss_gen import RSSGenerator
 from src.backup import Backup
-from src.generic_types import Feed
+from src.Feed import Feed
 from src.bot_commands import BotCommands
 from src.utils import Utils
 

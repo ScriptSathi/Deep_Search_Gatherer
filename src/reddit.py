@@ -2,8 +2,9 @@ from datetime import datetime
 from praw import Reddit as Reddit_Client, models as Rd_models
 from discord import Client, TextChannel
 from typing import Any, List
+from src.message_builders import PostMessage
 
-from src.generic_types import Feed
+from src.Feed import Feed
 from src.registered_data import RegisteredServer
 
 from src.logger import Logger
@@ -38,10 +39,13 @@ class Reddit(Feed):
             self.message.send_no_news()
         else:
             for new_post in self.news_to_publish:
-                link = "" if "url" in vars(new_post).values() and new_post.url != "" else f"- with link {new_post.url} -"
-                message = (f"**{new_post.title}** {link}" 
-                    + f"\nhttps://www.reddit.com/{new_post.permalink}")
-                self.message.send_news(message, self.type)
+                self.message.send_news(PostMessage(
+                    new_post.title, 
+                    "",
+                    "" if "url" in vars(new_post).values() and new_post.url != "" else new_post.url,
+                    self.url,
+                    f"https://www.reddit.com{new_post.permalink}"
+                ), self.type)
 
     def _register_latest_post(self, news_to_save: List[Any]) -> None:
         if news_to_save != []:
@@ -63,7 +67,6 @@ class Reddit(Feed):
                     news_to_save = [post for i, post in enumerate(all_posts) if i == 0]
                 else:
                     for single_news in all_posts:
-                        logger.info(single_news.url)
                         if self._is_too_old_news(datetime.fromtimestamp(single_news.created_utc)):
                             break
                         news_to_publish.append(single_news)
