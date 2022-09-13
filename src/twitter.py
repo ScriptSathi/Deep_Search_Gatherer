@@ -42,8 +42,7 @@ class Twitter(Feed):
     def _get_recent_tweets(self) -> List[Tweet]:
         return self.tw_client.get_users_tweets(
             self.user.id,
-            # expansions=["referenced_tweets.id"],
-            tweet_fields=['created_at', "referenced_tweets", "in_reply_to_user_id"] # ['context_annotations','created_at','geo']
+            tweet_fields=['created_at', "referenced_tweets", "in_reply_to_user_id"]
         ).data
 
     def _send_news(self) -> None:

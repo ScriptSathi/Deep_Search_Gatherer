@@ -27,16 +27,26 @@ To interact with the bot, simply tag at the beggining of the message(`@Informati
 | `list` | List all the registered feeds in your server |
 
 ### Examples
-
+####  Add Youtube channel or an RSS feed
 ```bash
 @Information Gatherer add https://www.youtube.com/c/LiveOverflow channel 1009496824605843607
 ```
 ```bash
-@Information Gatherer add https://www.youtube.com/c/LiveOverflow channel 1009496824605843607 name my-feed
+@Information Gatherer add https://www.youtube.com/c/LiveOverflow channel 1009496824605843607 name LiveOverflow
 ```
+####  Add Twitter
 ```bash
-@Information Gatherer del my-feed
+@Information Gatherer add @LiveOverflow channel 1009496824605843607
 ```
+####  Add Reddit
+```bash
+@Information Gatherer add r/netsec channel 1009496824605843607
+```
+####  Delete a feed
+```bash
+@Information Gatherer del LiveOverflow
+```
+####  List feeds
 ```bash
 @Information Gatherer ls
 ```
@@ -80,6 +90,8 @@ token: <TOKEN>
 | `refresh-time` | Time between refreshes of a feed, in second | 900 |
 | `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, only posts published after the initialization of this bot will be sent (usefull in case you use [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)) | 0 |
 | `gameplayed` | Change the game displayed in bot profile | "Eating some RSS feeds" |
+| `twitter` |<li>`enabled` (default: False) - Enable the feature<li>`bearer_token` (default: "") Needed to auth the Twitter API | [] |
+| `reddit` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the Reddit API<li>client_secret (default: "") Needed to auth the Reddit API<li>`password` (default: "") Needed to auth the Reddit account for accessing reddit data<li>`username` (default: "") Needed to auth the Reddit account for accessing reddit data | [] |
 
 ## [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)
 
