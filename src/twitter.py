@@ -77,18 +77,18 @@ class Twitter(Feed):
                         break
                     publishable_tweets.append(PublishableTweet(
                         True if tweet.referenced_tweets != [] and str(tweet.text).startswith('RT') else False,
-                        True if tweet.in_reply_to_user_id != None else False,
+                        True if tweet.in_reply_to_user_id != None and str(tweet.text).startswith('@') else False,
                         tweet
                     ))
             else:
                 if int(self.published_since) == 0:
-                    news_to_save = [
-                        PublishableTweet(
+                    last_news = PublishableTweet(
                             True if all_tweets[0].referenced_tweets != [] and str(all_tweets[0].text).startswith('RT') else False,
                             True if all_tweets[0].in_reply_to_user_id != None else False,
                             all_tweets[0]
                         )
-                    ]
+                    news_to_save = [last_news]
+                    publishable_tweets.append(last_news)
                 else:
                     for tweet in all_tweets:
                         if self._is_too_old_news(tweet.created_at):

@@ -115,7 +115,7 @@ class CommandMessageBuilder:
         desc_help = CommandBuilderUtils.build_multiple_line_string([
             f"Hey <@{self.author.id}> ! You don't know me yet ?",
             f"I've been created to help you getting in touch with any websites you want !",
-            f"Every time there will be a new article/video, i'll post it over discord on the channel you wanted",
+            f"Every time there will be a new tweet/reddit/article/video, i'll post it over discord on the channel you wanted",
             f"To help you using my services i'll tell you how i work."
         ])
         desc_error = CommandBuilderUtils.build_multiple_line_string([
@@ -125,9 +125,17 @@ class CommandMessageBuilder:
         description = desc_error if is_in_error else desc_help
 
         capabilites = CommandBuilderUtils.build_multiple_line_string([
-            f"- `Add` a new feed to the list on a specific channel",
-            f"- `Delete` a feed from the list on the current server",
-            f"- `List` all the feeds registered in the server"
+            f"- `Add` (cmd: add) a new feed to the list on a specific channel",
+            f"- `Delete` (cmd: del/delete) a feed from the list on the current server",
+            f"- `List` (cmd: ls/list) all the feeds registered in the server"
+        ])
+
+        features = CommandBuilderUtils.build_multiple_line_string([
+            f"- `Twitter` account can be follow with **add @TwitterAcount**",
+            f"- `Youtube` channel can be followed using the channel url **add https://youtube.example/MyYoutubeChannel**",
+            f"- `Reddit` with a subreddit using **add r/redditAccount**",
+            f"- `RSS` feed simply by giving the url **add https://URL-OF-THE-FEED.com**",
+            f"- `Static HTML pages` can be given as well to make it easily (may encounted weird behaviours)"
         ])
 
         examples = CommandBuilderUtils.build_multiple_line_string([
@@ -143,6 +151,7 @@ class CommandMessageBuilder:
                 color=Color.orange()
             )\
             .add_field(name="__Capabilites:__", value=capabilites, inline=False)\
+            .add_field(name="__Features:__", value=features, inline=False)\
             .add_field(name="__Examples:__", value=examples, inline=False)\
             .set_footer(text="Made with 🧡")
 
@@ -173,19 +182,21 @@ class CommandBuilderUtils:
         rss, reddit, twitter = 0, 1, 2
         feeds_list = ["**__RSS and Youtube:__**"]
         twitter_list = ["**__Twitter:__**"]
+        reddit_list = ["**__Reddit:__**"]
         for feed in server_config.feeds:
             feed_url = feed.url
             if feed.type == rss:
                 if FeedUtils.is_youtube_url(feed.url):
                     feed_url = FeedUtils.get_youtube_channel_url(feed.url)
-                feeds_list.append(f"**- Name: `{feed.name}` with url: {feed_url}**")
+                feeds_list.append(f"- Name: `{feed.name}` with url: **{feed_url}**")
             elif feed.type == reddit:
-                pass
+                reddit_list.append(f"- Name: `{feed.name}` for account **r/{feed_url}**")
             elif feed.type == twitter:
-                twitter_list.append(f"**- Name: `{feed.name}` for account @{feed_url}**")
+                twitter_list.append(f"- Name: `{feed.name}` for the user **@{feed_url}**")
         feeds_list = feeds_list if len(feeds_list) > 1 else []
         twitter_list = twitter_list if len(twitter_list) > 1 else []
-        return CommandBuilderUtils.build_multiple_line_string(feeds_list, twitter_list)
+        reddit_list = reddit_list if len(reddit_list) > 1 else []
+        return CommandBuilderUtils.build_multiple_line_string(feeds_list, twitter_list, reddit_list)
 
     def build_multiple_line_string(*args):
         output_msg = ""
