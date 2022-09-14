@@ -6,13 +6,15 @@
 
 ## <a name="introduction">Introduction</a>
 
-This project is a full featured RSS **discord bot** using 2 services over a docker compose. It is used to track RSS feeds / youtube channels or common websites and post it over discord channels
--  The [discord information gatherer bot](https://github.com/ScriptSathi/discord_information_gatherer) who track RSS feeds and youtube channel latest videos and publish it on discord 
+This project is a full featured RSS **discord bot** using 2 services over a docker compose. It is used to track RSS feeds / youtube channels / twitter accounts / subreddit or common websites and post it over discord channels
+-  The [discord information gatherer bot](https://github.com/ScriptSathi/discord_information_gatherer) who track RSS feeds, youtube channel, twitter accounts and subreddit and publish it on discord 
 - The [scrape2RSS](https://github.com/ScriptSathi/scrape2RSS/) who generate an RSS feed based on a simple url
 
 ## <a name="features">Features</a> 
 
 example url that can be tracked (you can put this in your config file to try it)
+- A Twitter account `@MyTwitterAccount`
+- A Subreddit `r/MySubreddit`
 - A very common RSS feed url `https://www.cert.ssi.gouv.fr/alerte/feed/`
 - A youtube channel `https://www.youtube.com/c/LiveOverflow`
 - A static webpage `https://www.synacktiv.com/publications`
