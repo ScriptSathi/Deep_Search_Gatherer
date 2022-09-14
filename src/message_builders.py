@@ -184,15 +184,15 @@ class CommandBuilderUtils:
         twitter_list = ["**__Twitter:__**"]
         reddit_list = ["**__Reddit:__**"]
         for feed in server_config.feeds:
-            feed_url = feed.url
+            feed_link = feed.link
             if feed.type == rss:
-                if FeedUtils.is_youtube_url(feed.url):
-                    feed_url = FeedUtils.get_youtube_channel_url(feed.url)
-                feeds_list.append(f"- Name: `{feed.name}` with url: **{feed_url}**")
+                if FeedUtils.is_youtube_url(feed.link):
+                    feed_link = FeedUtils.get_youtube_channel_url(feed.link)
+                feeds_list.append(f"- Name: `{feed.name}` with url: **{feed_link}**")
             elif feed.type == reddit:
-                reddit_list.append(f"- Name: `{feed.name}` for account **r/{feed_url}**")
+                reddit_list.append(f"- Name: `{feed.name}` for account **r/{feed_link}**")
             elif feed.type == twitter:
-                twitter_list.append(f"- Name: `{feed.name}` for the user **@{feed_url}**")
+                twitter_list.append(f"- Name: `{feed.name}` for the user **@{feed_link}**")
         feeds_list = feeds_list if len(feeds_list) > 1 else []
         twitter_list = twitter_list if len(twitter_list) > 1 else []
         reddit_list = reddit_list if len(reddit_list) > 1 else []

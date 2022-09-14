@@ -34,23 +34,24 @@ class Context:
             )
 
     def add(self, link: str, channel: TextChannel, name: str, type, last_post: str = "") -> Feed:
-        server = self.get_registered_server(channel.guild.id)
+        reg_server = self.get_registered_server(channel.guild.id)
         feed: Union[Feed, None] = self.manager.get_feed(type, "url", link)
-        if server == None:
-            server = RegisteredServer(channel.guild.id, channel.guild.name)
-            self.registered_data.append(server)
+        uid, _name = (feed.uid, feed.name) if feed != None else (ContextUtils.create_uid(10), name)
+        if reg_server == None:
+            reg_server = RegisteredServer(channel.guild.id, channel.guild.name)
+            self.registered_data.append(reg_server)
+        reg = RegisteredFeed(uid, type, _name, link, channel.id)
+        reg_server.feeds.append(reg)
         if feed == None:
-            uid = ContextUtils.create_uid(10)
             feed = self.manager.create_feed(
-                type, self.client, channel, name, link, server, uid, self.generator_exist, last_post,
+                type, self.client, channel, name, link, reg_server, uid, self.generator_exist, last_post,
                 self.twitter_client, self.reddit_client
                 )
             self.manager.append_feed(type, feed)
-            server.feeds.append(RegisteredFeed(uid, type, feed.name, link, channel.id))
         else:
             if not _.includes(feed.channels, channel):
                 feed.channels.append(channel)
-            for reg_feed in server.feeds:
+            for reg_feed in reg_server.feeds:
                 if reg_feed.name == name and not _.includes(reg_feed.registered_channels, channel):
                     reg_feed.registered_channels.append(channel.id)
         return feed
@@ -69,16 +70,8 @@ class Context:
             if server.id == server_id:
                 _.remove(server.feeds, lambda feed_to_delete: feed_to_delete.uid == feed.uid)
 
-    def get_registered_server(self, server_id: int) -> RegisteredServer:
-        server = None
-        for registered_server in self.registered_data:
-            if registered_server.id == server_id:
-                server = registered_server
-        return server
+    def get_registered_server(self, server_id: int) -> Union[RegisteredServer, None]:
+        return _.find(self.registered_data, lambda server: server.id == server_id)
 
-    def _get_registered_feed(self, feed_name, registered_server: RegisteredServer) -> RegisteredFeed:
-        feed = None
-        for registered_feed in registered_server.feeds:
-            if registered_feed.name == feed_name:
-                feed = registered_feed
-        return feed
+    def _get_registered_feed(self, feed_name, registered_server: RegisteredServer) -> Union[RegisteredFeed, None]:
+        return _.find(registered_server.feeds, lambda reg_feed: reg_feed.name == feed_name)
