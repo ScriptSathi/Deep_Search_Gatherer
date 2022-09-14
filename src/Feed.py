@@ -73,7 +73,7 @@ class Feed:
             "url": self.url,
             "last_post": self.last_post,
             "channels": [channel.id for channel in self.channels if channel.guild.id == server_id],
-            "type": self.type   ,
+            "type": self.type,
         }
 
     def _is_too_old_news(self, date_time: datetime.datetime, to_parse=False) -> bool:

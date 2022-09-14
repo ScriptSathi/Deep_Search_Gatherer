@@ -45,27 +45,25 @@ class Bot(Client):
         await self._run()
 
     async def _run(self) -> None:
-        while True:
-            feeds_to_poll = self.context.manager.feeds
-            feeds_to_poll_are_set = len(_.without(feeds_to_poll, [])) > 0
-            if feeds_to_poll_are_set:
-                while True:
-                    for type, all_feeds_type in enumerate(feeds_to_poll):
-                        for feed in all_feeds_type:
-                            if feed.is_valid_url:
-                                await Utils.try_again_if_fail(
-                                    self._start_feeds,
-                                    resolve_args=(feed,),
-                                    reject=self.exception_start_feeds,
-                                )
-                            else:
-                                self.context.remove(with_feed=(feed, type))
-                    Backup(self.context).save()
-                    await self._sleep_before_refresh()
-            else:
-                logger.info('No servers config set yet')
-                await self._sleep_before_refresh(10)
-                await self._run()
+        feeds_to_poll = self.context.manager.feeds
+        feeds_to_poll_are_set = len(_.without(feeds_to_poll, [])) > 0
+        while feeds_to_poll_are_set:
+            for type, all_feeds_type in enumerate(feeds_to_poll):
+                for feed in all_feeds_type:
+                    if feed.is_valid_url:
+                        await Utils.try_again_if_fail(
+                            self._start_feeds,
+                            resolve_args=(feed,),
+                            reject=self.exception_start_feeds,
+                        )
+                    else:
+                        self.context.remove(with_feed=(feed, type))
+            Backup(self.context).save()
+            await self._sleep_before_refresh()
+        else:
+            logger.info('No servers config set yet')
+            await self._sleep_before_refresh(10)
+            await self._run()
 
     def _start_feeds(self, feed: Feed) -> None:
         thread = Thread(target=feed.run)
@@ -74,7 +72,7 @@ class Bot(Client):
     def exception_start_feeds(self, exception: Exception) -> None:
         logger.exception(str(exception))
         logger.error(f'An unknown error occured while starting the feeds')
-    
+
     async def _sleep_before_refresh(self, time_to_sleep = 0) -> None:
         refresh_time = time_to_sleep if time_to_sleep != 0 else user_config['refresh_time']
         logger.info(f'Sleep for {refresh_time}s before the next refresh')

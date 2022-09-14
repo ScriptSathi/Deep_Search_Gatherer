@@ -5,7 +5,6 @@ from pydash import _
 from praw import Reddit as Reddit_Client
 
 from src.reddit import Reddit
-from src.user_config import User_config_dict
 from src.utils import FeedUtils
 from src.twitter import Twitter
 from src.rss import RSS
