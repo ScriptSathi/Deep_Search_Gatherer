@@ -1,4 +1,5 @@
 from asyncio import sleep
+from threading import Thread
 from pydash import _
 
 from .context import Context
@@ -24,7 +25,7 @@ class Crawler:
         while feeds_to_poll_are_set:
             for feed in self.queue.unvalid_feeds:
                 self.context.remove(with_feed=(feed, feed.type))
-            await self.queue.process(self.context.manager.feeds)
+            Thread(target=self.queue.process, args=(self.context.manager.feeds,)).start()
             Backup(self.context).save()
             await self._sleep_before_refresh()
         else:

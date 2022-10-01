@@ -1,6 +1,6 @@
 from pydash import _
 import requests, feedparser, random
-from asyncio import sleep
+from time import sleep
 
 from src.logger import Logger
 from src.constants import Constants
@@ -66,7 +66,7 @@ class Utils:
             headers[key] = value
         return requests.get(url, timeout=timeout, headers=headers, cookies=extra_cookies)
 
-    async def try_again_if_fail(resolve, max_retry=3, **args) -> None:
+    def try_again_if_fail(resolve, max_retry=3, **args) -> None:
         for attempt in range(max_retry):
             try:
                 resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
@@ -77,7 +77,7 @@ class Utils:
                 if attempt < max_retry:
                     retry_delay = 2
                     logger.error(f"Fail, retry in {retry_delay} seconds")
-                    await sleep(retry_delay)
+                    sleep(retry_delay)
                 resolve(*args["resolve_args"]) if "resolve_args" in args else resolve()
 
     def get_user_agent(reddit_username: str = None):

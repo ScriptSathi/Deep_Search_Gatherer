@@ -1,5 +1,8 @@
 import datetime, pytz, sys
 
+from sys import exit
+from datetime import datetime
+from pytz import timezone, utc
 from dateutil import parser
 from typing_extensions import TypedDict
 from discord import Client, TextChannel
@@ -79,21 +82,21 @@ class Feed:
             "type": self.type,
         }
 
-    def _is_too_old_news(self, date_time: datetime.datetime, to_parse=False) -> bool:
-        def get_timezone() -> pytz.timezone:
-            tz = 'Europe/Paris'
+    def _is_too_old_news(self, date_time: datetime, to_parse=False) -> bool:
+        def get_timezone() -> timezone:
+            str_tz = 'Europe/Paris'
             try:
-                timezone = pytz.timezone(tz)
+                tz = timezone(str_tz)
             except Exception:
-                timezone = pytz.utc
+                tz = utc
             return timezone
         if to_parse:
             date_time = parser.parse(date_time)
-        timezone = get_timezone()
-        time_since_published = timezone.localize(
-            datetime.datetime.now()
-        ) - date_time.astimezone(timezone)
+        tz = get_timezone()
+        time_since_published = tz.localize(
+            datetime.now()
+        ) - date_time.astimezone(tz)
         return not time_since_published.total_seconds() <= self.published_since
     
     def _close_thread(self) -> None:
-        sys.exit()
+        exit()
