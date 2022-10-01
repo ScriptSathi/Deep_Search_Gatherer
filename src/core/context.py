@@ -4,11 +4,11 @@ from discord import TextChannel, Client
 from pydash import _
 from typing import  List, Tuple, Union
 
-from src.utils import ContextUtils, Utils
 from src.user_config import User_config_dict
-from src.Feed import Feed
-from src.feeds_manager import FeedsManager
-from src.registered_data import RegisteredServer, RegisteredFeed
+from src.core.feeds import Feed
+from src.utils import ContextUtils, Utils
+from .feeds_manager import FeedsManager
+from .registered_data import RegisteredServer, RegisteredFeed
 
 class Context:
 
@@ -36,13 +36,11 @@ class Context:
     def add(self, link: str, channel: TextChannel, name: str, type, last_post: str = "") -> Feed:
         reg_server = self.get_registered_server(channel.guild.id)
         feed: Union[Feed, None] = self.manager.get_feed(type, "url", link)
-        uid, _name = (feed.uid, feed.name) if feed != None else (ContextUtils.create_uid(10), name)
-        if reg_server == None:
+        uid = feed.uid if feed is not None else ContextUtils.create_uid(10)
+        if reg_server is None:
             reg_server = RegisteredServer(channel.guild.id, channel.guild.name)
             self.registered_data.append(reg_server)
-        reg = RegisteredFeed(uid, type, _name, link, channel.id)
-        reg_server.feeds.append(reg)
-        if feed == None:
+        if feed is None:
             feed = self.manager.create_feed(
                 type, self.client, channel, name, link, reg_server, uid, self.generator_exist, last_post,
                 self.twitter_client, self.reddit_client
@@ -54,6 +52,8 @@ class Context:
             for reg_feed in reg_server.feeds:
                 if reg_feed.name == name and not _.includes(reg_feed.registered_channels, channel):
                     reg_feed.registered_channels.append(channel.id)
+        reg = RegisteredFeed(uid, type, feed.name, link, channel.id)
+        reg_server.feeds.append(reg)
         return feed
 
     def remove(self, **options: Union[Tuple[Feed, int], Tuple[str, int]]) -> None:

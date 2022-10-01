@@ -2,11 +2,11 @@ import os, yaml
 from typing import List
 from discord import Client, TextChannel
 from src.user_config import User_config_dict
-from src.message import Message
+from src.core.messages.message import Message
 
-from src.constants import Constants
-from src.context import Context
-from src.logger import Logger
+from .constants import Constants
+from .core import Context
+from .logger import Logger
 
 logger = Logger.get_logger()
 

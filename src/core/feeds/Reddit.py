@@ -2,10 +2,10 @@ from datetime import datetime
 from praw import Reddit as Reddit_Client, models as Rd_models
 from discord import Client, TextChannel
 from typing import Any, List
-from src.message_builders import PostMessage
 
-from src.Feed import Feed
-from src.registered_data import RegisteredServer
+from src.core.messages.message_builders import PostMessage
+from . import Feed
+from src.core.registered_data import RegisteredServer
 
 from src.logger import Logger
 logger = Logger.get_logger()

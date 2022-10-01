@@ -5,10 +5,10 @@ from time import sleep
 from html2text import HTML2Text
 from re import sub
 
-from src.message_builders import PostMessage
+from src.core.messages.message_builders import PostMessage
 from src.rss_gen import RSSGenerator
-from src.Feed import Feed
-from src.registered_data import RegisteredServer
+from . import Feed
+from src.core.registered_data import RegisteredServer
 
 class RSS(Feed):
 

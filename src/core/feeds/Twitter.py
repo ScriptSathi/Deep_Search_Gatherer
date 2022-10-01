@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import List
 from discord import Client, TextChannel
 from tweepy import Client as Twitter_Client, User, Tweet
-from src.message_builders import PostMessage
 
-from src.registered_data import RegisteredServer
-from src.Feed import Feed
+from src.core.messages.message_builders import PostMessage
+from src.core.registered_data import RegisteredServer
+from . import Feed
 
 @dataclass(frozen=True)
 class PublishableTweet:

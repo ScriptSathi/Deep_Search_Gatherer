@@ -3,11 +3,10 @@ import datetime, pytz, sys
 from dateutil import parser
 from typing_extensions import TypedDict
 from discord import Client, TextChannel
-from abc import ABCMeta, abstractclassmethod
 from typing import Any, List
 
-from src.registered_data import RegisteredServer
-from src.message import NewsMessage
+from src.core.registered_data import RegisteredServer
+from src.core.messages.message import NewsMessage
 
 Feed_backup_dict = TypedDict(
         'Feed',
@@ -27,7 +26,7 @@ class Feed:
     name: str
     server_on: RegisteredServer
     url: str
-    news_to_publish: List[any]
+    news_to_publish: List[Any]
     uid: int
     generator_exist: bool
     message: NewsMessage
@@ -57,6 +56,10 @@ class Feed:
         self.last_post = last_post
         self.type = type
         self.message = NewsMessage(client, channels, name)
+
+    def __repr__(self) -> str:
+        vars_in_str = ' '.join(f'{key}={value}' for key, value in vars(self).items())
+        return f'<Feed {vars_in_str}>'
 
     def run(self) -> None:
         pass

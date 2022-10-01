@@ -4,12 +4,9 @@ from typing import Dict, List, Union
 from pydash import _
 from praw import Reddit as Reddit_Client
 
-from src.reddit import Reddit
+from src.core.feeds import Reddit, Twitter, Feed, RSS
 from src.utils import FeedUtils
-from src.twitter import Twitter
-from src.rss import RSS
-from src.Feed import Feed
-from src.registered_data import RegisteredServer
+from src.core.registered_data import RegisteredServer
 
 class FeedsManager:
 
@@ -58,4 +55,4 @@ class FeedsManager:
         return self.feeds[type][index] if index != -1 else None
 
     def _get_feed_index(self, type: int, classvar_name: str, classvar_value: any) -> int:
-        return _.find_index(self.feeds[type], lambda item, i, feed: getattr(feed[i], classvar_name) == classvar_value)
+        return _.find_index(self.feeds[type], lambda _, i, feed: getattr(feed[i], classvar_name) == classvar_value)

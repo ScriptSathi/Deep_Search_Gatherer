@@ -1,8 +1,8 @@
 import os, json, yaml
-from typing import TypedDict
+from typing import Any, List, TypedDict
 
-from src.constants import Constants
-from src.logger import Logger
+from .constants import Constants
+from .logger import Logger
 
 logger = Logger.get_logger()
 
@@ -37,7 +37,7 @@ class UserConfig:
                 config[key] = value
         return config
 
-    def read_config_file(file_path) -> bool:
+    def read_config_file(file_path) -> List[Any]:
         config = []
         try:
             if os.path.isfile(file_path):

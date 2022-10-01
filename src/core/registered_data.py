@@ -1,6 +1,4 @@
 from typing import ClassVar, List
-from src.logger import Logger
-logger = Logger.get_logger()
 
 class RegisteredFeed:
     uid: ClassVar[int]

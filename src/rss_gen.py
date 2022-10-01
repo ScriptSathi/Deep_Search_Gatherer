@@ -1,6 +1,6 @@
-from src.constants import Constants
-from src.logger import Logger
-from src.utils import Utils
+from .constants import Constants
+from .logger import Logger
+from .utils import Utils
 
 logger = Logger.get_logger()
 

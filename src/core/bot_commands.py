@@ -1,9 +1,9 @@
 from discord import Client, Message, Guild, TextChannel, User, Member
-from typing import Literal, Tuple, Union
+from typing import Tuple, Union
 
 from src.utils import BotCommandsUtils, Utils
-from src.message import CommandMessage
-from src.context import Context
+from src.core.messages.message import CommandMessage
+from .context import Context
 
 class BotCommands:
 
@@ -53,7 +53,7 @@ class BotCommands:
 
     def _handle_feeds_list(self) -> None:
         reg_server = self.context.get_registered_server(self.server.id)
-        if reg_server == None or reg_server.feeds == []:
+        if reg_server is None or reg_server.feeds == []:
             self.message.send_feeds_list_empty(self.server.name)
         else:
             self.message.send_feeds_list(reg_server)
@@ -80,7 +80,7 @@ class BotCommands:
         elif link != None and not channel_obj != None:
             self.message.set_data_submited(channel=channel_submited, link=link)
             self.message.send_add_error(channel_in_error=True)
-        elif link == None and channel_obj != None:
+        elif link is None and channel_obj != None:
             self.message.set_data_submited(channel=channel_obj.name, link=link)
             self.message.send_add_error(url_in_error=True)
         else:
