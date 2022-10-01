@@ -10,7 +10,7 @@ RUN mkdir $HOME/backups
 ENV PATH="~/.local/bin:${PATH}"
 
 COPY *.py requirements.txt /opt/
-COPY src/*.py /opt/src/
+COPY src/ /opt/src/
 
 RUN python -m pip install --no-cache-dir --upgrade pip && \
 	python -m pip install --no-cache-dir -r /opt/requirements.txt
