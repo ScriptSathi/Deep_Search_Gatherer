@@ -16,5 +16,12 @@ class Constants:
             "enabled": False,
             "bearer_token": "",
         },
+        'reddit': {
+            "enabled": False,
+            "client_id": "",
+            "client_secret":"",
+            "password": "",
+            "username": "",
+        },
     }
     api_url = "http://scrape2rss:9292"
