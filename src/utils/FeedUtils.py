@@ -2,6 +2,7 @@ import tweepy
 
 from pydash import _
 import re, feedparser
+from twitchAPI import Twitch
 
 from src.logger import Logger
 from .utils import Utils
@@ -43,16 +44,26 @@ class FeedUtils:
 
     def is_reddit_url(link: str) -> bool:
         return link.startswith("/r/") or link.startswith("r/")
-            # or link.startswith("/u/") or link.startswith("u/") \
-            # or link.startswith("user/") or link.startswith("/user/")
 
     def is_twitter_link(link: str) -> bool:
         return link.startswith("@")
+
+    def is_twitch_link(link: str) -> bool:
+        return link.startswith("tw/")
 
     def is_twitter_user_exist(user: str, bearer_token: str) -> bool:
         try:
             return tweepy.Client(bearer_token=bearer_token).get_user(username=user).data.username == user
         except Exception:
+            return False
+
+    def is_twitch_channel_exist(user: str, client_id: str, client_secret: str) -> bool:
+        try:
+            user_data = Twitch(client_id, client_secret).get_users(logins=[user])
+            if user_data['data'] == []:
+                return False
+            return True
+        except:
             return False
 
     def is_subreddit_exist(subreddit_name: str, ) -> bool:
@@ -73,4 +84,8 @@ class FeedUtils:
     def find_reddit_feed_name(subreddit_name: str) -> str:
         subreddit_name = _.replace_start(subreddit_name, "/", "")
         subreddit_name = _.replace_start(subreddit_name, "r/", "")
+        return subreddit_name
+
+    def find_twitch_feed_name(subreddit_name: str) -> str:
+        subreddit_name = _.replace_start(subreddit_name, "tw/", "")
         return subreddit_name

@@ -1,6 +1,7 @@
 from typing import Literal, Tuple, Union
 from pydash import _
 
+from src.user_config import User_config_dict
 from .utils import Utils
 from .ContextUtils import ContextUtils
 from .FeedUtils import FeedUtils
@@ -20,9 +21,9 @@ class BotCommandsUtils:
             return list_trigger
         else:
             return 100
-    
-    def check_link_and_return(link_submited: str, bearer_token: str) -> Tuple[Literal[0, 1, 2, 100], Union[str, None]]:
-        rss, reddit, twitter = 0, 1, 2
+
+    def check_link_and_return(link_submited: str, user_config: User_config_dict) -> Tuple[Literal[0, 1, 2, 100], Union[str, None]]:
+        rss, reddit, twitter, twitch = 0, 1, 2, 3
         type = ContextUtils.get_type(link_submited)
         is_valid = False
         if reddit == type:
@@ -30,7 +31,14 @@ class BotCommandsUtils:
             is_valid = FeedUtils.is_subreddit_exist(link_submited)
         elif twitter == type:
             link_submited = _.replace_start(link_submited, "@", "")
-            is_valid = FeedUtils.is_twitter_user_exist(link_submited, bearer_token)
+            is_valid = FeedUtils.is_twitter_user_exist(link_submited, user_config["twitter"]["bearer_token"])
+        elif twitch == type:
+            link_submited = _.replace_start(link_submited, "tw/", "")
+            is_valid = FeedUtils.is_twitch_channel_exist(
+                link_submited,
+                user_config["twitch"]["client_id"],
+                user_config["twitch"]["client_secret"]
+            )
         elif rss == type:
             is_valid = FeedUtils.is_a_valid_url(link_submited)
             if is_valid:

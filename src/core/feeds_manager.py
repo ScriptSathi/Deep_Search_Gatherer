@@ -3,14 +3,15 @@ from discord import TextChannel, Client
 from typing import Dict, List, Union
 from pydash import _
 from praw import Reddit as Reddit_Client
+from twitchAPI import Twitch as Twitch_Client
 
-from src.core.feeds import Reddit, Twitter, Feed, RSS
+from src.core.feeds import Reddit, Twitter, Feed, RSS, Twitch
 from src.utils import FeedUtils
 from src.core.registered_data import RegisteredServer
 
 class FeedsManager:
 
-    feeds: List[List[Feed]] = [[],[],[]]
+    feeds: List[List[Feed]] = [[],[],[],[]]
 
     def append_feed(self, type: int, feed: Feed) -> None:
         self.feeds[type].append(feed)
@@ -30,8 +31,9 @@ class FeedsManager:
         last_post: str,
         twitter_client: Twitter_Client,
         reddit_client: Reddit_Client,
+        twitch_client: Twitch_Client,
     ) -> Feed:
-        rss, reddit, twitter = 0, 1, 2
+        rss, reddit, twitter, twitch = 0, 1, 2, 3
         feed: Feed
         if type == rss:
             if name == "":
@@ -45,6 +47,10 @@ class FeedsManager:
             if name == "":
                 name = FeedUtils.find_twitter_feed_name(url, twitter_client)
             feed = Twitter(client, [channel], name, url, server_on, uid, generator_exist, last_post, type, twitter_client)
+        elif type == twitch:
+            if name == "":
+                name = FeedUtils.find_twitch_feed_name(url)
+            feed = Twitch(client, [channel], name, url, server_on, uid, generator_exist, last_post, type, twitch_client)
         return feed
 
     def get_feed_backup(self, server_id: int, type: int, classvar_name: str, classvar_value: Union[str, int]) -> Dict[str, Union[str, int]]:

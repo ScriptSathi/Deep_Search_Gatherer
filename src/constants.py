@@ -16,10 +16,15 @@ class Constants:
             "enabled": False,
             "bearer_token": "",
         },
+        'twitch': {
+            "enabled": False,
+            "client_id": "",
+            "client_secret": "",
+        },
         'reddit': {
             "enabled": False,
             "client_id": "",
-            "client_secret":"",
+            "client_secret": "",
             "password": "",
             "username": "",
         },

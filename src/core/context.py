@@ -1,4 +1,5 @@
 from tweepy import Client as Twitter_Client
+from twitchAPI import Twitch as Twitch_Client
 from praw import Reddit as Reddit_Client
 from discord import TextChannel, Client
 from pydash import _
@@ -18,6 +19,7 @@ class Context:
     user_config: User_config_dict
     generator_exist: bool
     twitter_client: Twitter_Client
+    twitch_client: Twitch_Client
     reddit_client: Reddit_Client
 
     def __init__(self, client: Client, generator_exist: bool, user_config: User_config_dict) -> None:
@@ -25,6 +27,7 @@ class Context:
         self.generator_exist = generator_exist
         self.user_config = user_config
         self.twitter_client = Twitter_Client(bearer_token=user_config["twitter"]["bearer_token"])
+        self.twitch_client = Twitch_Client(user_config["twitch"]["client_id"], user_config["twitch"]["client_secret"])
         self.reddit_client = Reddit_Client(
                 client_id=user_config["reddit"]["client_id"],
                 client_secret=user_config["reddit"]["client_secret"],
@@ -43,7 +46,7 @@ class Context:
         if feed is None:
             feed = self.manager.create_feed(
                 type, self.client, channel, name, link, reg_server, uid, self.generator_exist, last_post,
-                self.twitter_client, self.reddit_client
+                self.twitter_client, self.reddit_client, self.twitch_client
                 )
             self.manager.append_feed(type, feed)
         else:

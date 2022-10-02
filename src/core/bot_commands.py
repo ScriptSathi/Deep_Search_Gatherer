@@ -61,7 +61,7 @@ class BotCommands:
     async def _handle_adding_feed(self, link_submited: str, channel_submited: str, name_submited: str) -> None:
         type, link = BotCommandsUtils.check_link_and_return(
             link_submited, 
-            self.context.user_config["twitter"]["bearer_token"]
+            self.context.user_config
         )
         try:
             channel_obj = await self.client.fetch_channel(str(channel_submited))

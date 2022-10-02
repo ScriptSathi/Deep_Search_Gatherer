@@ -17,6 +17,11 @@ User_config_dict = TypedDict(
                 "enabled": bool,
                 "bearer_token": str,
             }),
+            'twitch': TypedDict('twitch',{
+                "enabled": bool,
+                "client_id": str,
+                "client_secret":str,
+            }),
             'reddit': TypedDict('reddit',{
                 "enabled": bool,
                 "client_id": str,
