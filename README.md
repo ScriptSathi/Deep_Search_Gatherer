@@ -6,7 +6,7 @@
 
 ## <a name="introduction">Introduction</a>
 
-This project is a full featured RSS **discord bot** using 2 services over a docker compose. It is used to track RSS feeds / youtube channels / twitter accounts / subreddit or common websites and post it over discord channels
+This project is a full featured RSS **discord bot** using 2 services over a docker compose. It is used to track RSS feeds / youtube channels / twitter accounts/ twitch channels / subreddit or common websites and post it over discord channels
 -  The [discord information gatherer bot](https://github.com/ScriptSathi/discord_information_gatherer) who track RSS feeds, youtube channel, twitter accounts and subreddit and publish it on discord 
 - The [scrape2RSS](https://github.com/ScriptSathi/scrape2RSS/) who generate an RSS feed based on a simple url
 
@@ -14,6 +14,7 @@ This project is a full featured RSS **discord bot** using 2 services over a dock
 
 example url that can be tracked (you can put this in your config file to try it)
 - A Twitter account `@MyTwitterAccount`
+- A Twitch channel `tw/TwitchChannel`
 - A Subreddit `r/MySubreddit`
 - A very common RSS feed url `https://www.cert.ssi.gouv.fr/alerte/feed/`
 - A youtube channel `https://www.youtube.com/c/LiveOverflow`
@@ -80,6 +81,13 @@ To interact with the bot, simply tag the bot at the beggining of the message(`@I
 ####  List feeds
 ```bash
 @Information Gatherer ls
+```
+
+## Troubleshooting
+
+If the name of you channel/account is parsed by the discord markdown (for exemple: \_my\_channel\_) you can use backticks arround the name to escape it 
+```
+@Information Gatherer add `@LiveOverflow` channel 1009496824605843607
 ```
 
 ## <a name="min-config">Minimal configuration needed</a> 
