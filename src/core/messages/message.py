@@ -57,10 +57,10 @@ class NewsMessage(Message):
     def __init__(self, client: discord.Client, channels: List[discord.TextChannel], feed_name: str) -> None:
         super().__init__(client, channels, feed_name, is_a_news=True)
 
-    def send_news(self, news: PostMessage, type: int):
+    def send_news(self, news: PostMessage, type: int, embed: bool = False):
         message = NewsMessageBuilder(news).build_message(type)
         self._send_stdout(news=news.title)
-        self._send_discord(message)
+        self._send_discord(message, embed)
 
     def send_no_news(self):
         self._send_stdout(no_news=True)

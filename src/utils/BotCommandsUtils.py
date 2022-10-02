@@ -24,6 +24,7 @@ class BotCommandsUtils:
 
     def check_link_and_return(link_submited: str, user_config: User_config_dict) -> Tuple[Literal[0, 1, 2, 100], Union[str, None]]:
         rss, reddit, twitter, twitch = 0, 1, 2, 3
+        link_submited = link_submited.replace("`", "")
         type = ContextUtils.get_type(link_submited)
         is_valid = False
         if reddit == type:

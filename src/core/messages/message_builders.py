@@ -28,7 +28,7 @@ class CommandMessageBuilder:
             f"I'm trying to delete the feed, please wait"
         ])
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
                 color=Color.orange()
@@ -37,7 +37,7 @@ class CommandMessageBuilder:
     def build_delete_success_message(self):
         description = f"The feed has been correctly deleted\n"
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
                 color=Color.green()
@@ -54,7 +54,7 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> There's no feed named: `{self.feed_name_submited}` registered\n"
         ]
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=descriptions[status],
                 color=Color.red()
@@ -67,7 +67,7 @@ class CommandMessageBuilder:
             f"I'm trying to add the feed, please wait",
         ])
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
                 color=Color.orange()
@@ -77,7 +77,7 @@ class CommandMessageBuilder:
         description = f"The feed as been correctly added with name `{feed_name}`\n" +\
             f"Next time there will be an article in the feed, it will be posted on the channel"
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
                 color=Color.green()
@@ -102,7 +102,7 @@ class CommandMessageBuilder:
             "link and channel id"
         ]
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=descriptions[status],
                 color=Color.red()
@@ -130,6 +130,7 @@ class CommandMessageBuilder:
 
         features = CommandBuilderUtils.build_multiple_line_string([
             f"- `Twitter` account can be follow with **add @TwitterAcount**",
+            f"- `Twitch` channels can be follow with **add tw/TwitchChannelName**",
             f"- `Youtube` channel can be followed using the channel url **add https://youtube.example/MyYoutubeChannel**",
             f"- `Reddit` with a subreddit using **add r/redditAccount**",
             f"- `RSS` feed simply by giving the url **add https://URL-OF-THE-FEED.com**",
@@ -142,8 +143,14 @@ class CommandMessageBuilder:
             f"> **<@{self.bot_id}> list**"
         ])
 
+        troubleshoot = CommandBuilderUtils.build_multiple_line_string([
+            'If you encounter weird behaviour with names due to the discord markdown parser, you can escape it using backticks "\`" around the name',
+            f"> \`@My_Twitter_Account\`",
+            f"> \`tw/My_Twitch_Channel\`",
+        ])
+
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
                 color=Color.orange()
@@ -151,6 +158,7 @@ class CommandMessageBuilder:
             .add_field(name="__Capabilites:__", value=capabilites, inline=False)\
             .add_field(name="__Features:__", value=features, inline=False)\
             .add_field(name="__Examples:__", value=examples, inline=False)\
+            .add_field(name="__Troubleshoot:__", value=troubleshoot, inline=False)\
             .set_footer(text="Made with 🧡")
 
     def build_feeds_list_message(self, reg_server: RegisteredServer):
@@ -158,17 +166,17 @@ class CommandMessageBuilder:
             f"Here is the list of all the feeds registered on the server `{reg_server.name}`\n"
         feed_list = CommandBuilderUtils.get_feed_list_message(reg_server)
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description + "\n" + feed_list,
                 color=Color.orange()
-                )
+            )
 
     def build_feeds_list_empty_message(self, server_name):
         description = \
             f"There is no feeds registered in the server `{server_name}` yet\n"
         return Embed(
-            title=Constants.bot_name,
+                title=Constants.bot_name,
                 url=Constants.source_code_url,
                 description=description,
                 color=Color.orange()
@@ -214,6 +222,7 @@ class PostMessage:
     link: str
     author: str = 'Unknow Author'
     sec_link: str = ""
+    activity_title: str = ""
 
 class NewsMessageBuilder:
 
@@ -223,7 +232,7 @@ class NewsMessageBuilder:
         self.single_news = single_news
 
     def build_message(self, type: int) -> str:
-        rss, reddit, twitter = 0, 1, 2
+        rss, reddit, twitter, twitch = 0, 1, 2, 3
 
         if type == rss:
             return self._render_rss_message()
@@ -231,6 +240,8 @@ class NewsMessageBuilder:
             return self._render_reddit_message()
         elif type == twitter:
             return self._render_twitter_message()
+        elif type == twitch:
+            return self._render_twitch_message()
 
     def _render_twitter_message(self) -> str:
         return f"**{self.single_news.author}** {self.single_news.content}"
@@ -249,3 +260,14 @@ class NewsMessageBuilder:
             if field != '' :
                 message += field + '\n'
         return message
+
+    def _render_twitch_message(self):
+        return Embed(
+                title=self.single_news.title,
+                url=self.single_news.link,
+                description=f"On {self.single_news.activity_title}",
+                color=Color.blue()
+            )\
+            .set_author(name=self.single_news.author, icon_url=self.single_news.sec_link)\
+            .set_image(url=self.single_news.sec_link)\
+            .add_field(name="__Description:__", value=self.single_news.content, inline=False)

@@ -87,6 +87,7 @@ class BotCommands:
             self.message.send_add_error()
 
     async def _handle_deletion_feed(self, server_id: int, feed_name: str) -> None:
+        feed_name = feed_name.replace("`", "")
         self.message.set_data_submited(feed_name=feed_name)
         self.message.send_delete_waiting()
         if feed_name != '':
