@@ -1,14 +1,15 @@
-# [Twitter/Youtube/Reddit/RSS discord bot](https://github.com/ScriptSathi/discord_rss)
+# [Twitter/Twitch/Youtube/Reddit/RSS discord bot](https://github.com/ScriptSathi/discord_rss)
 
 ## <a name="introduction">Introduction</a>
 
-This bot is a multi server content tracker. It can follow twitter accounts/youtube channels/subreddit/rss feeds and static web pages with articles (when using the [full project](https://github.com/ScriptSathi/Deep_Search_Gatherer)) or RSS feeds and post it on the discord channels you want. To configure part of it you just need to use the available [commands](#bot-cmds)
+This bot is a multi server content tracker. It can follow twitter accounts/twitch channels/youtube channels/subreddit/rss feeds and static web pages with articles (when using the [full project](https://github.com/ScriptSathi/Deep_Search_Gatherer)) or RSS feeds and post it on the discord channels you want. To configure part of it you just need to use the available [commands](#bot-cmds)
 <br/>
 This is part of a full featured discord bot, the [Deep Search Gatherer bot](https://github.com/ScriptSathi/Deep_Search_Gatherer). It can be run on it's own or with the [Scrape2RSS project](https://github.com/ScriptSathi/scrape2RSS) for tracking any websites that don't have rss feed and you wish to follow.
 
 ## <a name="features">Features</a>
 
 - Follow a Twitter account
+- Follow a Twitch channel
 - Follow a subreddit
 - Follow an RSS feed and post latests news
 - Follow a Youtube channel and post latests videos
@@ -52,6 +53,13 @@ To interact with the bot, simply tag at the beggining of the message(`@Informati
 ####  List feeds
 ```bash
 @Information Gatherer ls
+```
+
+## Troubleshooting
+
+If the name of you channel/account is parsed by the discord markdown (for exemple: \_my\_channel\_) you can use backticks arround the name to escape it 
+```
+@Information Gatherer add `@LiveOverflow` channel 1009496824605843607
 ```
 
 ## <a name="disclaimer">Disclaimer</a>
