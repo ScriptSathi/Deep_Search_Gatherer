@@ -31,7 +31,7 @@ class FeedsManager:
         last_post: str,
         twitter_client: Twitter_Client,
         reddit_client: Reddit_Client,
-        twitch_client: Twitch_Client,
+        twitch_client: Union[Twitch_Client, None],
     ) -> Feed:
         rss, reddit, twitter, twitch = 0, 1, 2, 3
         feed: Feed
@@ -47,7 +47,7 @@ class FeedsManager:
             if name == "":
                 name = FeedUtils.find_twitter_feed_name(url, twitter_client)
             feed = Twitter(client, [channel], name, url, server_on, uid, generator_exist, last_post, type, twitter_client)
-        elif type == twitch:
+        elif type == twitch and twitch_client is not None:
             if name == "":
                 name = FeedUtils.find_twitch_feed_name(url)
             feed = Twitch(client, [channel], name, url, server_on, uid, generator_exist, last_post, type, twitch_client)

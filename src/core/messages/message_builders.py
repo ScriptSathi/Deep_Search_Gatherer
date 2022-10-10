@@ -185,10 +185,11 @@ class CommandMessageBuilder:
 
 class CommandBuilderUtils:
     def get_feed_list_message(server_config: RegisteredServer):
-        rss, reddit, twitter = 0, 1, 2
+        rss, reddit, twitter, twitch = 0, 1, 2, 3
         feeds_list = ["**__RSS and Youtube:__**"]
         twitter_list = ["**__Twitter:__**"]
         reddit_list = ["**__Reddit:__**"]
+        twitch_list = ["**__Twitch:__**"]
         for feed in server_config.feeds:
             feed_link = feed.link
             if feed.type == rss:
@@ -199,10 +200,13 @@ class CommandBuilderUtils:
                 reddit_list.append(f"- Name: `{feed.name}` for account **r/{feed_link}**")
             elif feed.type == twitter:
                 twitter_list.append(f"- Name: `{feed.name}` for the user **@{feed_link}**")
+            elif feed.type == twitch:
+                twitch_list.append(f"- Name: `{feed.name}` for the twitch channel **{feed_link}**")
         feeds_list = feeds_list if len(feeds_list) > 1 else []
         twitter_list = twitter_list if len(twitter_list) > 1 else []
         reddit_list = reddit_list if len(reddit_list) > 1 else []
-        return CommandBuilderUtils.build_multiple_line_string(feeds_list, twitter_list, reddit_list)
+        twitch_list = twitch_list if len(twitch_list) > 1 else []
+        return CommandBuilderUtils.build_multiple_line_string(feeds_list, twitter_list, reddit_list, twitch_list)
 
     def build_multiple_line_string(*args):
         output_msg = ""

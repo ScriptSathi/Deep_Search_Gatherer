@@ -102,7 +102,8 @@ token: <TOKEN>
 | `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, only posts published after the initialization of this bot will be sent (usefull in case you use [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)) | 0 |
 | `gameplayed` | Change the game displayed in bot profile | "Eating some RSS feeds" |
 | `twitter` |<li>`enabled` (default: False) - Enable the feature<li>`bearer_token` (default: "") Needed to auth the Twitter API | [] |
-| `reddit` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the Reddit API<li>client_secret (default: "") Needed to auth the Reddit API<li>`password` (default: "") Needed to auth the Reddit account for accessing reddit data<li>`username` (default: "") Needed to auth the Reddit account for accessing reddit data | [] |
+| `reddit` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the Reddit API<li>`client_secret` (default: "") Needed to auth the Reddit API<li>`password` (default: "") Needed to auth the Reddit account for accessing reddit data<li>`username` (default: "") Needed to auth the Reddit account for accessing reddit data | [] |
+| `twitch` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the [Twitch API](https://dev.twitch.tv/docs/authentication)<li>`client_secret` (default: "") Needed to auth the [Twitch API](https://dev.twitch.tv/docs/authentication)| [] |
 
 ## [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)
 
