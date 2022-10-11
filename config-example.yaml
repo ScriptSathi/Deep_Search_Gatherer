@@ -10,3 +10,7 @@ reddit:
   client_secret: CLIENT_SECRET
   password: USER_PWD
   username: USERNAME
+twitch:
+  enabled: True
+  client_id: TWITCH_CLIENT_ID
+  client_secret: TWITCH_CLIENT_SECRET
