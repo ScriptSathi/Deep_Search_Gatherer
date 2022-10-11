@@ -36,21 +36,11 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> you asked for deleting `{self.feed_name_submited}`",
             f"I'm trying to delete the feed, please wait"
         ])
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=description,
-                color=Color.orange()
-            )
+        return build_embed(description)
 
     def build_delete_success_message(self):
         description = f"The feed has been correctly deleted\n"
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=description,
-                color=Color.green()
-            )\
+        return build_embed(description)\
             .set_footer(text="Rest in Peace little feed 🪦")
 
     def build_delete_error_message(self, **props):
@@ -62,12 +52,7 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> The submitted name `{self.feed_name_submited}` is invalid \n",
             f"<@{self.author.id}> There's no feed named: `{self.feed_name_submited}` registered\n"
         ]
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=descriptions[status],
-                color=Color.red()
-            )\
+        return build_embed(descriptions[status], Color.red())\
             .set_footer(text=f"Try again with a registered feed 🚨")
 
     def build_add_waiting_message(self):
@@ -75,22 +60,12 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> you asked for adding `{self.link_submited}` in the channel `{self.channel_submited}`",
             f"I'm trying to add the feed, please wait",
         ])
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=description,
-                color=Color.orange()
-            )
+        return build_embed(description)
 
     def build_add_success_message(self, feed_name):
         description = f"The feed as been correctly added with name `{feed_name}`\n" +\
             f"Next time there will be an article in the feed, it will be posted on the channel"
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=description,
-                color=Color.green()
-            )\
+        return build_embed(description, Color.green())\
             .set_footer(text="Now you just need to enjoy the news posted 📰")
 
     def build_add_error_message(self, **props):
@@ -110,12 +85,7 @@ class CommandMessageBuilder:
             "channel id",
             "link and channel id"
         ]
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=descriptions[status],
-                color=Color.red()
-            )\
+        return build_embed(descriptions[status], Color.red())\
             .set_footer(text=f"Try again with a valid {footers[status]} 🚨")
 
     def build_help_message(self, is_in_error=False):
@@ -158,12 +128,7 @@ class CommandMessageBuilder:
             f"> \`tw/My_Twitch_Channel\`",
         ])
 
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=description,
-                color=Color.orange()
-            )\
+        return build_embed(description)\
             .add_field(name="__Capabilites:__", value=capabilites, inline=False)\
             .add_field(name="__Features:__", value=features, inline=False)\
             .add_field(name="__Examples:__", value=examples, inline=False)\
@@ -179,12 +144,7 @@ class CommandMessageBuilder:
     def build_feeds_list_empty_message(self, server_name):
         description = \
             f"There is no feeds registered in the server `{server_name}` yet\n"
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=description,
-                color=Color.orange()
-            )\
+        return build_embed(description)\
             .set_footer(text="Register first a feed, if you don't how to do, try the `help` command")
 
 class CommandBuilderUtils:
@@ -264,12 +224,7 @@ class NewsMessageBuilder:
         return message
 
     def _render_twitch_message(self):
-        return Embed(
-                title=self.single_news.title,
-                url=self.single_news.link,
-                description=f"On {self.single_news.activity_title}",
-                color=Color.blue()
-            )\
+        return build_embed(f"On {self.single_news.activity_title}", Color.blue())\
             .set_author(name=self.single_news.author, icon_url=self.single_news.sec_link)\
             .set_image(url=self.single_news.sec_link)\
             .add_field(name="__Description:__", value=self.single_news.content, inline=False)
