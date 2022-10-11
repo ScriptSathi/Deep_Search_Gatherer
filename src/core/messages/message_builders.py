@@ -1,9 +1,18 @@
 from dataclasses import dataclass
+from typing import List
 from discord import User, Color, Embed
 
 from src.core.registered_data import RegisteredServer
 from src.utils import FeedUtils
 from src.constants import Constants
+
+def build_embed(message, color = Color.orange()):
+    return Embed(
+            title=Constants.bot_name,
+            url=Constants.source_code_url,
+            description=message,
+            color=color
+        )
 
 class CommandMessageBuilder:
 
@@ -165,12 +174,7 @@ class CommandMessageBuilder:
         description = \
             f"Here is the list of all the feeds registered on the server `{reg_server.name}`\n"
         feed_list = CommandBuilderUtils.get_feed_list_message(reg_server)
-        return Embed(
-                title=Constants.bot_name,
-                url=Constants.source_code_url,
-                description=description + "\n" + feed_list,
-                color=Color.orange()
-            )
+        return [build_embed(description + current_list) for current_list in feed_list]
 
     def build_feeds_list_empty_message(self, server_name):
         description = \
@@ -184,7 +188,7 @@ class CommandMessageBuilder:
             .set_footer(text="Register first a feed, if you don't how to do, try the `help` command")
 
 class CommandBuilderUtils:
-    def get_feed_list_message(server_config: RegisteredServer):
+    def get_feed_list_message(server_config: RegisteredServer) -> List[str]:
         rss, reddit, twitter, twitch = 0, 1, 2, 3
         feeds_list = ["**__RSS and Youtube:__**"]
         twitter_list = ["**__Twitter:__**"]
@@ -202,22 +206,16 @@ class CommandBuilderUtils:
                 twitter_list.append(f"- Name: `{feed.name}` for the user **@{feed_link}**")
             elif feed.type == twitch:
                 twitch_list.append(f"- Name: `{feed.name}` for the twitch channel **{feed_link}**")
-        feeds_list = feeds_list if len(feeds_list) > 1 else []
-        twitter_list = twitter_list if len(twitter_list) > 1 else []
-        reddit_list = reddit_list if len(reddit_list) > 1 else []
-        twitch_list = twitch_list if len(twitch_list) > 1 else []
-        return CommandBuilderUtils.build_multiple_line_string(feeds_list, twitter_list, reddit_list, twitch_list)
+        feeds_list_arr = [list for list in [feeds_list, twitter_list, reddit_list, twitch_list] if len(list) > 1]
+        complete_feed_list = CommandBuilderUtils.build_multiple_line_string(*feeds_list_arr)
+        list_is_too_long_for_discord = len(complete_feed_list) >= 4096
+        return (
+            [complete_feed_list],
+            ["\n".join(list) for list in feeds_list_arr]
+        )[list_is_too_long_for_discord]
 
-    def build_multiple_line_string(*args):
-        output_msg = ""
-        for array_of_messages in args:
-            for i, msg in enumerate(array_of_messages):
-                output_msg += msg
-                if i <  len(array_of_messages) - 1:
-                    output_msg += "\n"
-            if array_of_messages != []:
-                output_msg += "\n\n"
-        return output_msg
+    def build_multiple_line_string(*args) -> str:
+        return "".join('\n'.join(array_of_messages) + '\n' for array_of_messages in args)
 
 @dataclass(frozen=True)
 class PostMessage:

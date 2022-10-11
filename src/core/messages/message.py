@@ -94,7 +94,8 @@ class CommandMessage(Message):
 
     def send_feeds_list(self, reg_server: RegisteredServer):
         answer_to_user = self.builder.build_feeds_list_message(reg_server)
-        self._send_discord(answer_to_user, True)
+        for single_answer in answer_to_user:
+            self._send_discord(single_answer, True)
 
     def send_feeds_list_empty(self, server_name):
         answer_to_user = self.builder.build_feeds_list_empty_message(server_name)
