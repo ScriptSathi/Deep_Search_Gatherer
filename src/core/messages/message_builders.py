@@ -6,10 +6,10 @@ from src.core.registered_data import RegisteredServer
 from src.utils import FeedUtils
 from src.constants import Constants
 
-def build_embed(message, color = Color.orange()):
+def build_embed(message, color = Color.orange(), title = Constants.bot_name, url = Constants.source_code_url):
     return Embed(
-            title=Constants.bot_name,
-            url=Constants.source_code_url,
+            title=title,
+            url=url,
             description=message,
             color=color
         )
@@ -224,7 +224,7 @@ class NewsMessageBuilder:
         return message
 
     def _render_twitch_message(self):
-        return build_embed(f"On {self.single_news.activity_title}", Color.blue())\
+        return build_embed(f"On {self.single_news.activity_title}", Color.blue(), self.single_news.title, self.single_news.link)\
             .set_author(name=self.single_news.author, icon_url=self.single_news.sec_link)\
             .set_image(url=self.single_news.sec_link)\
             .add_field(name="__Description:__", value=self.single_news.content, inline=False)
