@@ -46,10 +46,10 @@ class FeedUtils:
         return link.startswith("/r/") or link.startswith("r/")
 
     def is_twitter_link(link: str) -> bool:
-        return link.startswith("@")
+        return link.startswith("@") or link.startswith("https://www.twitter.com") or link.startswith("https://twitter.com")
 
     def is_twitch_link(link: str) -> bool:
-        return link.startswith("tw/")
+        return link.startswith("tw/") or link.startswith("https://twitch.tv") or link.startswith("https://www.twitch.tv")
 
     def is_twitter_user_exist(user: str, bearer_token: str) -> bool:
         try:

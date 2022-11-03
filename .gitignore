@@ -1,5 +1,3 @@
 *.swp
 __pycache__
 *.json
-*.yaml
-*.yml

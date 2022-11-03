@@ -1,3 +1,5 @@
+# All of the params are optionnal (exept token) and can be remove from this file, default values are visible in constants.py
+# By default thius config file need to be mount as a volume at path /config, but you can change this value in constants.py
 token: OTg1MzgZE3cwNDQyMTF67TU5.GFl0nX.WeyI8vqX3yO6kqh8Oia6cDpgEkZ1zH6eNHN9w8
 refresh_time: 900
 game_displayed: Eating some RSS feeds
