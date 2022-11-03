@@ -44,7 +44,7 @@ class RSS(Feed):
 
     def _register_latest_post(self, news_to_save: List[Any]) -> None:
         if news_to_save != []:
-            self.last_post = news_to_save[0].title
+            self.last_post = news_to_save[0].published
 
     def _get_news(self) -> List[Any]: # TODO Refacto this
         all_posts = self._get_feed_data(self.url)
@@ -54,7 +54,7 @@ class RSS(Feed):
         if is_not_in_error:
             if self.last_post != '':
                 for single_news in all_posts:
-                    if single_news.title == self.last_post:
+                    if single_news.published == self.last_post:
                         break
                     news_to_publish.append(single_news)
             else:
