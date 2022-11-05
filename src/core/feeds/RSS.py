@@ -35,12 +35,22 @@ class RSS(Feed):
             self.message.send_no_news()
         else:
             for new_post in self.news_to_publish:
-                self.message.send_news(PostMessage(
-                    new_post.title,
-                    self._parse_html(new_post) if not self._is_youtube_feed(new_post) else '',
-                    new_post.link,
-                    self._render_author(new_post),
-                ), self.type)
+                if self._is_youtube_feed(new_post):
+                    self.message.send_news(PostMessage(
+                        new_post.title,
+                        new_post.summary,
+                        new_post.link,
+                        new_post.author,
+                        new_post.media_thumbnail[0]['url'],
+                        new_post.published
+                        ), self.type, True)
+                else:
+                    self.message.send_news(PostMessage(
+                        new_post.title,
+                        self._parse_html(new_post),
+                        new_post.link,
+                        self._render_author(new_post),
+                    ), self.type, False)
 
     def _register_latest_post(self, news_to_save: List[Any]) -> None:
         if news_to_save != []:

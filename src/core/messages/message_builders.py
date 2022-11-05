@@ -1,17 +1,22 @@
 from dataclasses import dataclass
 from typing import List
 from discord import User, Color, Embed
+from datetime import datetime
 
 from src.core.registered_data import RegisteredServer
 from src.utils import FeedUtils
 from src.constants import Constants
 
-def build_embed(message, color = Color.orange(), title = Constants.bot_name, url = Constants.source_code_url):
+def build_embed(
+    message, color = Color.orange(), title = Constants.bot_name, url = Constants.source_code_url,
+    timestamp = datetime.utcnow()
+    ) -> Embed:
     return Embed(
             title=title,
             url=url,
             description=message,
-            color=color
+            color=color,
+            timestamp=timestamp
         )
 
 class CommandMessageBuilder:
@@ -41,7 +46,7 @@ class CommandMessageBuilder:
     def build_delete_success_message(self):
         description = f"The feed has been correctly deleted\n"
         return build_embed(description)\
-            .set_footer(text="Rest in Peace little feed 🪦")
+            .set_footer(text="🪦 Rest in Peace little feed")
 
     def build_delete_error_message(self, **props):
         status = 1
@@ -53,7 +58,7 @@ class CommandMessageBuilder:
             f"<@{self.author.id}> There's no feed named: `{self.feed_name_submited}` registered\n"
         ]
         return build_embed(descriptions[status], Color.red())\
-            .set_footer(text=f"Try again with a registered feed 🚨")
+            .set_footer(text=f"🚨 Try again with a registered feed")
 
     def build_add_waiting_message(self):
         description = CommandBuilderUtils.build_multiple_line_string([
@@ -66,7 +71,7 @@ class CommandMessageBuilder:
         description = f"The feed as been correctly added with name `{feed_name}`\n" +\
             f"Next time there will be an article in the feed, it will be posted on the channel"
         return build_embed(description, Color.green())\
-            .set_footer(text="Now you just need to enjoy the news posted 📰")
+            .set_footer(text="📰 Now you just need to enjoy the news posted")
 
     def build_add_error_message(self, **props):
         status = 2
@@ -86,7 +91,7 @@ class CommandMessageBuilder:
             "link and channel id"
         ]
         return build_embed(descriptions[status], Color.red())\
-            .set_footer(text=f"Try again with a valid {footers[status]} 🚨")
+            .set_footer(text=f"🚨 Try again with a valid {footers[status]}")
 
     def build_help_message(self, is_in_error=False):
         desc_help = CommandBuilderUtils.build_multiple_line_string([
@@ -193,11 +198,10 @@ class NewsMessageBuilder:
     def __init__(self, single_news: PostMessage) -> None:
         self.single_news = single_news
 
-    def build_message(self, type: int) -> str:
+    def build_message(self, type: int, embed: bool) -> str:
         rss, reddit, twitter, twitch = 0, 1, 2, 3
-
         if type == rss:
-            return self._render_rss_message()
+            return self._render_rss_message() if not embed else self._render_rss_embed_message()
         if type == reddit:
             return self._render_reddit_message()
         elif type == twitter:
@@ -223,8 +227,20 @@ class NewsMessageBuilder:
                 message += field + '\n'
         return message
 
-    def _render_twitch_message(self):
-        return build_embed(f"On {self.single_news.activity_title}", Color.blue(), self.single_news.title, self.single_news.link)\
-            .set_author(name=self.single_news.author, icon_url=self.single_news.sec_link)\
+    def _render_rss_embed_message(self) -> Embed:
+        youtube_logo = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/YouTube_social_white_squircle.svg/2048px-YouTube_social_white_squircle.svg.png'
+        return build_embed(f"{self.single_news.author} release a new video", Color.red(), self.single_news.title, 
+            self.single_news.link, timestamp=datetime.fromisoformat(self.single_news.activity_title))\
+            .set_author(name=self.single_news.author, icon_url= youtube_logo)\
             .set_image(url=self.single_news.sec_link)\
-            .add_field(name="__Description:__", value=self.single_news.content, inline=False)
+            .add_field(name="__Description:__", value=self.single_news.content, inline=False)\
+            .set_footer(text='\u200b', icon_url=youtube_logo)
+
+
+    def _render_twitch_message(self) -> Embed:
+        twitch_logo = 'https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c540.png'
+        return build_embed(f"On {self.single_news.activity_title}", Color.purple(), f"**{self.single_news.title}**", self.single_news.link)\
+            .set_author(name=self.single_news.author, icon_url=twitch_logo)\
+            .set_image(url=self.single_news.sec_link)\
+            .add_field(name="__Description:__", value=self.single_news.content, inline=False)\
+            .set_footer(text='\u200b', icon_url=twitch_logo)

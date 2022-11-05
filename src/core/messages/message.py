@@ -58,7 +58,7 @@ class NewsMessage(Message):
         super().__init__(client, channels, feed_name, is_a_news=True)
 
     def send_news(self, news: PostMessage, type: int, embed: bool = False):
-        message = NewsMessageBuilder(news).build_message(type)
+        message = NewsMessageBuilder(news).build_message(type, embed)
         self._send_stdout(news=news.title)
         self._send_discord(message, embed)
 

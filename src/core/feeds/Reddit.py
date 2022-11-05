@@ -7,9 +7,6 @@ from src.core.messages.message_builders import PostMessage
 from . import Feed
 from src.core.registered_data import RegisteredServer
 
-from src.logger import Logger
-logger = Logger.get_logger()
-
 class Reddit(Feed):
 
     rd_client: Reddit_Client
