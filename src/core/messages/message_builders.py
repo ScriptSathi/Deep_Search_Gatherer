@@ -234,7 +234,7 @@ class NewsMessageBuilder:
             .set_author(name=self.single_news.author, icon_url= youtube_logo)\
             .set_image(url=self.single_news.sec_link)\
             .add_field(name="__Description:__", value=self.single_news.content, inline=False)\
-            .set_footer(text='\u200b', icon_url=youtube_logo)
+            .set_footer(text='Youtube \u200b', icon_url=youtube_logo)
 
 
     def _render_twitch_message(self) -> Embed:
@@ -243,4 +243,4 @@ class NewsMessageBuilder:
             .set_author(name=self.single_news.author, icon_url=twitch_logo)\
             .set_image(url=self.single_news.sec_link)\
             .add_field(name="__Description:__", value=self.single_news.content, inline=False)\
-            .set_footer(text='\u200b', icon_url=twitch_logo)
+            .set_footer(text='Twitch \u200b', icon_url=twitch_logo)
