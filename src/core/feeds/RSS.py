@@ -38,7 +38,7 @@ class RSS(Feed):
                 if self._is_youtube_feed(new_post):
                     self.message.send_news(PostMessage(
                         new_post.title,
-                        new_post.summary,
+                        self._short_summary(new_post.summary),
                         new_post.link,
                         new_post.author,
                         new_post.media_thumbnail[0]['url'],
@@ -138,3 +138,9 @@ class RSS(Feed):
 
     def _is_youtube_feed(self, new_post):
         return 'yt_videoid' in new_post
+
+    def _short_summary(self, summary: str):
+        if len(summary) >= 1024:
+            return summary[:1020] + "..."
+        else:
+            return summary
