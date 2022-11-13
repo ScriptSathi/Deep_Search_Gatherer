@@ -1,3 +1,4 @@
+from datetime import datetime
 from discord import Client, TextChannel
 from typing import Any, List
 import feedparser
@@ -42,7 +43,8 @@ class RSS(Feed):
                         new_post.link,
                         new_post.author,
                         new_post.media_thumbnail[0]['url'],
-                        new_post.published
+                        "",
+                        datetime.fromisoformat(new_post.published)
                         ), self.type, True)
                 else:
                     self.message.send_news(PostMessage(

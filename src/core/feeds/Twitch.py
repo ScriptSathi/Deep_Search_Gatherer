@@ -1,4 +1,5 @@
-from typing import Any, List, TypedDict
+from datetime import datetime
+from typing import List, TypedDict
 from discord import Client, TextChannel
 from twitchAPI import Twitch as Twitch_Client
 
@@ -57,6 +58,7 @@ class Twitch(Feed):
                 channel_data['display_name'],
                 channel_data['thumbnail_url'],
                 channel_data['game_name'],
+                datetime.strptime(channel_data['started_at'], "%Y-%m-%dT%H:%M:%SZ")
             ), self.type, True)
         else:
             self.message.send_no_news()

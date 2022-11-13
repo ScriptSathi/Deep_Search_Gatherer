@@ -45,7 +45,7 @@ class CommandMessageBuilder:
 
     def build_delete_success_message(self):
         description = f"The feed has been correctly deleted\n"
-        return build_embed(description)\
+        return build_embed(description, Color.green())\
             .set_footer(text="🪦 Rest in Peace little feed")
 
     def build_delete_error_message(self, **props):
@@ -190,6 +190,7 @@ class PostMessage:
     author: str = 'Unknow Author'
     sec_link: str = ""
     activity_title: str = ""
+    timestamp: datetime = datetime.now()
 
 class NewsMessageBuilder:
 
@@ -230,7 +231,7 @@ class NewsMessageBuilder:
     def _render_rss_embed_message(self) -> Embed:
         youtube_logo = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/YouTube_social_white_squircle.svg/2048px-YouTube_social_white_squircle.svg.png'
         return build_embed(f"{self.single_news.author} release a new video", Color.red(), self.single_news.title, 
-            self.single_news.link, timestamp=datetime.fromisoformat(self.single_news.activity_title))\
+            self.single_news.link, timestamp=self.single_news.timestamp)\
             .set_author(name=self.single_news.author, icon_url= youtube_logo)\
             .set_image(url=self.single_news.sec_link)\
             .add_field(name="__Description:__", value=self.single_news.content, inline=False)\
@@ -239,7 +240,8 @@ class NewsMessageBuilder:
 
     def _render_twitch_message(self) -> Embed:
         twitch_logo = 'https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c540.png'
-        return build_embed(f"On {self.single_news.activity_title}", Color.purple(), f"**{self.single_news.title}**", self.single_news.link)\
+        return build_embed(f"On {self.single_news.activity_title}", Color.purple(), f"**{self.single_news.title}**",
+        self.single_news.link, timestamp=self.single_news.timestamp)\
             .set_author(name=self.single_news.author, icon_url=twitch_logo)\
             .set_image(url=self.single_news.sec_link)\
             .add_field(name="__Description:__", value=self.single_news.content, inline=False)\
