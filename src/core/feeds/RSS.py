@@ -140,7 +140,7 @@ class RSS(Feed):
         return 'yt_videoid' in new_post
 
     def _short_summary(self, summary: str):
-        if len(summary) >= 600:
-            return summary[:600] + "..."
+        if len(summary) >= 450:
+            return summary[:450] + "..."
         else:
             return summary
