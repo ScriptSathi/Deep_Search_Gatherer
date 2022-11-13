@@ -1,5 +1,4 @@
-from discord import Client, Game, MemberCacheFlags, Message
-from threading import Thread
+from discord import Client, Game, Intents, MemberCacheFlags, Message
 from pydash import _
 
 from src import Utils, Logger, Crawler, Context, BotCommands, Backup, RSSGenerator, UserConfig
@@ -39,6 +38,7 @@ class Bot(Client):
 if __name__ == "__main__":
     user_config = UserConfig.load_user_config()
     Bot(
+        intents=Intents.default(),
         chunk_guilds_at_startup=False,
         member_cache_flags=MemberCacheFlags.none(),
         max_messages=None,
