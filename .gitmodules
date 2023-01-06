@@ -1,6 +1,0 @@
-[submodule "externals/discord_information_gatherer"]
-	path = externals/discord_information_gatherer
-	url = https://github.com/ScriptSathi/discord_information_gatherer.git
-[submodule "externals/scrape2RSS"]
-	path = externals/scrape2RSS
-	url = https://github.com/ScriptSathi/scrape2RSS.git

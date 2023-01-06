@@ -1,10 +1,10 @@
-# [Twitter/Twitch/Youtube/Reddit/RSS discord bot](https://github.com/ScriptSathi/discord_rss)
+# [Twitter/Twitch/Youtube/Reddit/RSS discord bot](https://github.com/ScriptSathi/Deep_Search_Gatherer)
 
 ## <a name="introduction">Introduction</a>
 
 This bot is a multi server content tracker. It can follow twitter accounts/twitch channels/youtube channels/subreddit/rss feeds and static web pages with articles (when using the [full project](https://github.com/ScriptSathi/Deep_Search_Gatherer)) or RSS feeds and post it on the discord channels you want. To configure part of it you just need to use the available [commands](#bot-cmds)
 <br/>
-This is part of a full featured discord bot, the [Deep Search Gatherer bot](https://github.com/ScriptSathi/Deep_Search_Gatherer). It can be run on it's own or with the [Scrape2RSS project](https://github.com/ScriptSathi/scrape2RSS) for tracking any websites that don't have rss feed and you wish to follow.
+This is part of a full featured discord bot, the [Deep Search Gatherer bot](https://github.com/ScriptSathi/Deep_Search_Gatherer). It can be run on it's own or with the [Scrape2RSS project](../scrape2RSS/README.md) for tracking any websites that don't have rss feed and you wish to follow.
 
 ## <a name="features">Features</a>
 
@@ -99,13 +99,13 @@ token: <TOKEN>
 |----|----| ----|
 | `token` | Your bot token, it's **mandatory** variable. | "" |
 | `refresh-time` | Time between refreshes of a feed, in second | 900 |
-| `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, only posts published after the initialization of this bot will be sent (usefull in case you use [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)) | 0 |
+| `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, only posts published after the initialization of this bot will be sent (usefull in case you use [Scrape2RSS feature](../scrape2RSS/README.md)) | 0 |
 | `gameplayed` | Change the game displayed in bot profile | "Eating some RSS feeds" |
 | `twitter` |<li>`enabled` (default: False) - Enable the feature<li>`bearer_token` (default: "") Needed to auth the Twitter API | [] |
 | `reddit` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the Reddit API<li>`client_secret` (default: "") Needed to auth the Reddit API<li>`password` (default: "") Needed to auth the Reddit account for accessing reddit data<li>`username` (default: "") Needed to auth the Reddit account for accessing reddit data | [] |
 | `twitch` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the [Twitch API](https://dev.twitch.tv/docs/authentication)<li>`client_secret` (default: "") Needed to auth the [Twitch API](https://dev.twitch.tv/docs/authentication)| [] |
 
-## [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)
+## [Scrape2RSS feature](../scrape2RSS/README.md)
 
 If you want to follow a website that doesn't have an RSS feed, submit the URL of the page in the `url` parameter like a normal feed.
 To be used, you need to set the [full bot project](https://github.com/ScriptSathi/Deep_Search_Gatherer)

@@ -1,4 +1,4 @@
-# [Scrape2RSS](https://github.com/ScriptSathi/scrape2RSS)
+# [Scrape2RSS](./README.md)
 
 This project take an url as entry with articles you wanted to follow, and return an RSS feed
 

@@ -1,7 +1,8 @@
 version: "3.9"
 services:
+
   bot:
-    image: rssbot
+    build: discord_bot/
     restart: on-failure
     configs:
       - source: discord_bot_config_file
@@ -10,11 +11,14 @@ services:
       - scrape2rss
     volumes:
       - backups:/home/rssbot/backups/
+
   scrape2rss:
-    image: scrape2rss
+    build: scrape2RSS/
     restart: on-failure
+
 configs:
   discord_bot_config_file:
-    file: ./config_file
+    file: ./config_file_goes_in_here
+
 volumes:
   backups:

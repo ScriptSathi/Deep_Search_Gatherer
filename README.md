@@ -7,8 +7,8 @@
 ## <a name="introduction">Introduction</a>
 
 This project is a full featured RSS **discord bot** using 2 services over a docker compose. It is used to track RSS feeds / youtube channels / twitter accounts/ twitch channels / subreddit or common websites and post it over discord channels
--  The [discord information gatherer bot](https://github.com/ScriptSathi/discord_information_gatherer) who track RSS feeds, youtube channel, twitter accounts and subreddit and publish it on discord 
-- The [scrape2RSS](https://github.com/ScriptSathi/scrape2RSS/) who generate an RSS feed based on a simple url
+-  The [discord information gatherer bot](./discord_bot/README.md) who track RSS feeds, youtube channel, twitter accounts and subreddit and publish it on discord 
+- The [scrape2RSS](./scrape2RSS/README.md) who generate an RSS feed based on a simple url
 
 ## <a name="features">Features</a> 
 
@@ -26,26 +26,22 @@ This project need docker to be installed and this **is not** intended as an intr
 
  If you are unfamiliar with Docker, check out the [Introduction to Docker](https://training.docker.com/introduction-to-docker) webinar, or consult your favorite search engine.
 
-## <a name="prepare">Prepare the project</a>
+## <a name="install">Installation</a>
 
-Before starting the project you need to pull git submodules and build the docker images.
-```
-bash init.sh
-```
+Copy the `config-example.yaml` file, change all the option you need and put the file into `config_file_goes_in_here/` directory
 
-## <a name="start">Start the project</a>
+Then you can simply start docker compose
 
-After you added your configuration file in `config_file` (view next section for this part), just run the below command
 ```
-docker compose -d up
+docker compose up -d
 ```
 
 ## <a name="config-file">Create the config file</a>
 
 The configuration file is compatible with either `json` and `yaml` (or `yml`) format.
-View the documentation [here](https://github.com/ScriptSathi/discord_information_gatherer) for json usage.
+View the documentation [here](./discord_bot/README.md) for json usage.
 <br/>
-**Put your configuration file in the `config_file/` directory**
+**Put your configuration file in the `config_file_goes_in_here/` directory**
 
 ## <a name="bot-cmds">Bot Commands</a>
 
@@ -102,14 +98,14 @@ token: <TOKEN>
 |----|----| ----|
 | `token` | Your bot token, it's **mandatory** variable. | "" |
 | `refresh-time` | Time between refreshes of a feed, in second | 900 |
-| `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, only posts published after the initialization of this bot will be sent (usefull in case you use [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)) | 0 |
+| `published_since_default` | Maximum age of news before it's discarded, in second. Used only when `published_since` of a feed is not set. <br/>If `published_since_default` or `published_since` are equal to `0`, only posts published after the initialization of this bot will be sent (usefull in case you use [Scrape2RSS feature](./scrape2RSS/README.md)) | 0 |
 | `gameplayed` | Change the game displayed in bot profile | "Eating some RSS feeds" |
 | `twitter` |<li>`enabled` (default: False) - Enable the feature<li>`bearer_token` (default: "") Needed to auth the Twitter API | [] |
 | `reddit` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the Reddit API<li>`client_secret` (default: "") Needed to auth the Reddit API<li>`password` (default: "") Needed to auth the Reddit account for accessing reddit data<li>`username` (default: "") Needed to auth the Reddit account for accessing reddit data | [] |
 | `twitch` |<li>`enabled` (default: False) - Enable the feature<li>`client_id` (default: "") Needed to auth the [Twitch API](https://dev.twitch.tv/docs/authentication)<li>`client_secret` (default: "") Needed to auth the [Twitch API](https://dev.twitch.tv/docs/authentication)| [] |
 
 
-## [Scrape2RSS feature](https://github.com/ScriptSathi/scrape2RSS)
+## [Scrape2RSS feature](./scrape2RSS/README.md)
 
 If you want to follow a website that doesn't have an RSS feed, submit the URL of the page in the `url` parameter like a normal feed.
 To be used, you need to set the [full bot project](https://github.com/ScriptSathi/Deep_Search_Gatherer)

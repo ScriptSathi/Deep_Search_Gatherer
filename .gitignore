@@ -1,4 +1,6 @@
 *.yaml
 *.yml
 *.json
-config_file/*
+config_file/*.yml
+config_file/*.yaml
+config_file/*.json
