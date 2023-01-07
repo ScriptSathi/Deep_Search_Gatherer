@@ -9,8 +9,10 @@ services:
         target: /config/
     depends_on:
       - scrape2rss
+    command: sh -c "while true; do sleep 3000; done"
     volumes:
       - backups:/home/rssbot/backups/
+      - ${PWD}/discord_bot/:/opt/
 
   scrape2rss:
     build: scrape2RSS/

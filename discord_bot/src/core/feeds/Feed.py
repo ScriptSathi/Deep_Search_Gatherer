@@ -82,21 +82,21 @@ class Feed:
             "type": self.type,
         }
 
-    def _is_too_old_news(self, date_time: datetime, to_parse=False) -> bool:
+    def _is_too_old_news(self, date_time: datetime, last_publication_in_sec = 0, to_parse=False) -> bool:
         def get_timezone() -> timezone:
             str_tz = 'Europe/Paris'
             try:
                 tz = timezone(str_tz)
             except Exception:
                 tz = utc
-            return timezone
+            return tz
         if to_parse:
             date_time = parser.parse(date_time)
         tz = get_timezone()
         time_since_published = tz.localize(
             datetime.now()
         ) - date_time.astimezone(tz)
-        return not time_since_published.total_seconds() <= self.published_since
-    
+        return not time_since_published.total_seconds() <= last_publication_in_sec
+
     def _close_thread(self) -> None:
         exit()

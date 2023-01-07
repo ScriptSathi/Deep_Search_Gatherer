@@ -73,7 +73,8 @@ class Twitter(Feed):
         if is_not_in_error:
             if self.last_post != '':
                 for tweet in all_tweets:
-                    if str(tweet.created_at) == self.last_post:
+                    if (str(tweet.created_at) == self.last_post
+                    or self._is_too_old_news(tweet.created_at, 3600)):
                         break
                     publishable_tweets.append(PublishableTweet(
                         True if tweet.referenced_tweets != [] and str(tweet.text).startswith('RT') else False,
@@ -81,23 +82,14 @@ class Twitter(Feed):
                         tweet
                     ))
             else:
-                if int(self.published_since) == 0:
-                    last_news = PublishableTweet(
-                            True if all_tweets[0].referenced_tweets != [] and str(all_tweets[0].text).startswith('RT') else False,
-                            True if all_tweets[0].in_reply_to_user_id != None else False,
-                            all_tweets[0]
-                        )
-                    news_to_save = [last_news]
-                    publishable_tweets.append(last_news)
-                else:
-                    for tweet in all_tweets:
-                        if self._is_too_old_news(tweet.created_at):
-                            break
-                        publishable_tweets.append(PublishableTweet(
-                            True if tweet.referenced_tweets != [] and str(tweet.text).startswith('RT') else False,
-                            True if tweet.in_reply_to_user_id != None and str(tweet.text).startswith('@') else False,
-                            tweet
-                        ))
+                for tweet in all_tweets:
+                    if self._is_too_old_news(tweet.created_at, 3600):
+                        break
+                    publishable_tweets.append(PublishableTweet(
+                        True if tweet.referenced_tweets != [] and str(tweet.text).startswith('RT') else False,
+                        True if tweet.in_reply_to_user_id != None and str(tweet.text).startswith('@') else False,
+                        tweet
+                    ))
             self._register_latest_post(news_to_save)
             reversed_list_from_oldest_to_earliest = list(reversed(publishable_tweets))
             return reversed_list_from_oldest_to_earliest

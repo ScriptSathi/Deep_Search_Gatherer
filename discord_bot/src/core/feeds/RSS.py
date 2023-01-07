@@ -66,17 +66,15 @@ class RSS(Feed):
         if is_not_in_error:
             if self.last_post != '':
                 for single_news in all_posts:
-                    if single_news.published == self.last_post:
+                    if (single_news.published == self.last_post
+                    or self._is_too_old_news(single_news['published'], 3600, True)):
                         break
                     news_to_publish.append(single_news)
             else:
-                if int(self.published_since) == 0:
-                    news_to_save = [all_posts[0]]
-                else:
-                    for single_news in all_posts:
-                        if self._is_too_old_news(single_news['published'], True):
-                            break
-                        news_to_publish.append(single_news)
+                for single_news in all_posts:
+                    if self._is_too_old_news(single_news['published'], 3600, True):
+                        break
+                    news_to_publish.append(single_news)
             self._register_latest_post(news_to_save)
             reversed_list_from_oldest_to_earliest = list(reversed(news_to_publish))
             return reversed_list_from_oldest_to_earliest

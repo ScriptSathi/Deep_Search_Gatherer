@@ -56,17 +56,15 @@ class Reddit(Feed):
         if is_not_in_error:
             if self.last_post != '':
                 for single_news in all_posts:
-                    if single_news.created_utc == self.last_post:
+                    if (single_news.created_utc == self.last_post
+                    or self._is_too_old_news(datetime.fromtimestamp(single_news.created_utc), 3600)):
                         break
                     news_to_publish.append(single_news)
             else:
-                if int(self.published_since) == 0:
-                    news_to_save = [post for i, post in enumerate(all_posts) if i == 0]
-                else:
-                    for single_news in all_posts:
-                        if self._is_too_old_news(datetime.fromtimestamp(single_news.created_utc)):
-                            break
-                        news_to_publish.append(single_news)
+                for single_news in all_posts:
+                    if self._is_too_old_news(datetime.fromtimestamp(single_news.created_utc), 3600):
+                        break
+                    news_to_publish.append(single_news)
             self._register_latest_post(news_to_save)
             return_list: List[Rd_models.Submission] = []
             for elem in news_to_publish:
