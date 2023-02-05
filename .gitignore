@@ -4,3 +4,6 @@
 config_file/*.yml
 config_file/*.yaml
 config_file/*.json
+
+env/
+discord_bot/env/

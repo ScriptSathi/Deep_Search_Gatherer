@@ -2,7 +2,9 @@ import tweepy
 
 from pydash import _
 import re, feedparser
-from twitchAPI import Twitch
+from twitchAPI.twitch import Twitch
+from twitchAPI.helper import first
+
 
 from src.logger import Logger
 from .utils import Utils
@@ -57,12 +59,9 @@ class FeedUtils:
         except Exception:
             return False
 
-    def is_twitch_channel_exist(user: str, client_id: str, client_secret: str) -> bool:
+    async def is_twitch_channel_exist(user: str, client_id: str, client_secret: str) -> bool:
         try:
-            user_data = Twitch(client_id, client_secret).get_users(logins=[user])
-            if user_data['data'] == []:
-                return False
-            return True
+            return (await first((await Twitch(client_id, client_secret)).get_users(logins=user))).login == user
         except:
             return False
 

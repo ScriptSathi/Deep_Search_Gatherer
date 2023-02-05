@@ -22,32 +22,31 @@ class BotCommandsUtils:
         else:
             return 100
 
-    def check_link_and_return(link_submited: str, user_config: User_config_dict) -> Tuple[Literal[0, 1, 2, 100], Union[str, None]]:
+    async def check_link_and_return(link_submited: str, user_config: User_config_dict) -> Tuple[Literal[0, 1, 2, 100], Union[str, None]]:
         rss, reddit, twitter, twitch = 0, 1, 2, 3
         link_submited = link_submited.replace("`", "")
         type_of_feed = ContextUtils.get_type(link_submited)
         is_valid = False
-        link = ''
         if reddit == type_of_feed:
-            link = FeedUtils.find_reddit_feed_name(link_submited)
+            link_submited = FeedUtils.find_reddit_feed_name(link_submited)
             is_valid = FeedUtils.is_subreddit_exist(link_submited)
         elif twitter == type_of_feed:
             if '@' in link_submited:
-                link = _.replace_start(link_submited, "@", "")
+                link_submited = _.replace_start(link_submited, "@", "")
             elif 'www' in link_submited: 
-                link = _.replace_start(link_submited, "https://www.twitter.com/", "")
+                link_submited = _.replace_start(link_submited, "https://www.twitter.com/", "")
             else:
-                link = _.replace_start(link_submited, "https://twitter.com/", "")
-            is_valid = FeedUtils.is_twitter_user_exist(link, user_config["twitter"]["bearer_token"])
+                link_submited = _.replace_start(link_submited, "https://twitter.com/", "")
+            is_valid = FeedUtils.is_twitter_user_exist(link_submited, user_config["twitter"]["bearer_token"])
         elif twitch == type_of_feed:
             if 'tw/' in link_submited:
-                link = _.replace_start(link_submited, "tw/", "")
+                link_submited = _.replace_start(link_submited, "tw/", "")
             elif 'www' in link_submited: 
-                link = _.replace_start(link_submited, "https://www.twitch.tv/", "")
+                link_submited = _.replace_start(link_submited, "https://www.twitch.tv/", "")
             else:
-                link = _.replace_start(link_submited, "https://twitch.tv/", "")
-            is_valid = FeedUtils.is_twitch_channel_exist(
-                link,
+                link_submited = _.replace_start(link_submited, "https://twitch.tv/", "")
+            is_valid = await FeedUtils.is_twitch_channel_exist(
+                link_submited,
                 user_config["twitch"]["client_id"],
                 user_config["twitch"]["client_secret"]
             )
@@ -55,8 +54,8 @@ class BotCommandsUtils:
             is_valid = FeedUtils.is_a_valid_url(link_submited)
             if is_valid:
                 if FeedUtils.is_youtube_url(link_submited) and not "feeds" in link_submited:
-                    link = FeedUtils.get_youtube_feed_url(link_submited)
+                    link_submited = FeedUtils.get_youtube_feed_url(link_submited)
         if is_valid:
-            return type_of_feed, link
+            return type_of_feed, link_submited
         else:
             return type_of_feed, None

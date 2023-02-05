@@ -26,17 +26,22 @@ class Context:
         self.client = client
         self.generator_exist = generator_exist
         self.user_config = user_config
-        self.twitter_client = Twitter_Client(bearer_token=user_config["twitter"]["bearer_token"])
-        self.twitch_client = Twitch_Client(user_config["twitch"]["client_id"], user_config["twitch"]["client_secret"])\
-                                if user_config["twitch"]["enabled"]\
-                                else None
+
+    async def build_APIs_clients(self) -> None:
+        self.twitter_client = Twitter_Client(bearer_token=self.user_config["twitter"]["bearer_token"])
+        self.twitch_client = await Twitch_Client(
+                self.user_config["twitch"]["client_id"],
+                self.user_config["twitch"]["client_secret"]
+            )\
+                if self.user_config["twitch"]["enabled"]\
+                else None
         self.reddit_client = Reddit_Client(
-                client_id=user_config["reddit"]["client_id"],
-                client_secret=user_config["reddit"]["client_secret"],
-                password=user_config["reddit"]["password"],
-                user_agent=Utils.get_user_agent(),
-                username=user_config["reddit"]["username"],
-            )
+            client_id=self.user_config["reddit"]["client_id"],
+            client_secret=self.user_config["reddit"]["client_secret"],
+            password=self.user_config["reddit"]["password"],
+            user_agent=Utils.get_user_agent(),
+            username=self.user_config["reddit"]["username"],
+        )
 
     def add(self, link: str, channel: TextChannel, name: str, type, last_post: str = "") -> Feed:
         reg_server = self.get_registered_server(channel.guild.id)

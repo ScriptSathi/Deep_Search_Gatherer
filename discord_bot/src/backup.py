@@ -14,6 +14,7 @@ class Backup:
 
     async def load(client: Client, generator_exist: bool, user_config: User_config_dict) -> Context:
         context = Context(client, generator_exist, user_config)
+        await context.build_APIs_clients()
         try:
             with open(Constants.backup_path, 'r') as yaml_file:
                 backup_data = yaml.safe_load(yaml_file)['servers']
