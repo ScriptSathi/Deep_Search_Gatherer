@@ -1,4 +1,4 @@
-FROM python:3.10-alpine3.16
+FROM python:3.11-alpine3.16
 
 # Create user rssbot for security purpose and switch to it
 RUN adduser -D -u 1000 rssbot
