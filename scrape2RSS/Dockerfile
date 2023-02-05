@@ -1,4 +1,4 @@
-FROM ruby:3.1.2-alpine3.16
+FROM ruby:3.2.0-alpine3.16
 
 COPY config.ru Gemfile /opt/
 COPY src/*.rb /opt/src/
