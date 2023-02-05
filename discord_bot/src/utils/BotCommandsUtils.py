@@ -55,8 +55,8 @@ class BotCommandsUtils:
             is_valid = FeedUtils.is_a_valid_url(link_submited)
             if is_valid:
                 if FeedUtils.is_youtube_url(link_submited) and not "feeds" in link_submited:
-                    link = FeedUtils.get_youtube_feed_url(link_submited)
+                    link_submited = FeedUtils.get_youtube_feed_url(link_submited)
         if is_valid:
-            return type_of_feed, link
+            return type_of_feed, link_submited
         else:
             return type_of_feed, None
