@@ -7,5 +7,5 @@ requests>=2.27.1<=3
 pyyaml==6.0
 pydash==6.0.1
 tweepy==4.12.1
-praw==7.6.1
+praw==7.7.0
 twitchAPI==3.7.0
