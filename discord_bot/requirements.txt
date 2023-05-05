@@ -5,7 +5,7 @@ python-dateutil>=2.8.0<=3
 pytz==2022.7.1
 requests>=2.27.1<=3
 pyyaml==6.0
-pydash==6.0.1
+pydash==7.0.3
 tweepy==4.12.1
 praw==7.6.1
 twitchAPI==3.7.0
