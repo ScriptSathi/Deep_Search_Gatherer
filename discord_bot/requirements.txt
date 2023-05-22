@@ -8,4 +8,4 @@ pyyaml==6.0
 pydash==6.0.1
 tweepy==4.12.1
 praw==7.6.1
-twitchAPI==3.7.0
+twitchAPI==3.11.0
