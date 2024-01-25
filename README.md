@@ -1,5 +1,10 @@
 # [Deep search gatherer](https://github.com/ScriptSathi/Deep_Search_Gatherer)
 
+## Disclaimer
+
+Since i did not have time to update this project with all the major changes on the project, this is currently dead for now.
+If you try it, it will probably simply don't work.
+
 ## Prerequisite
 
 - Docker Compose version v2.6.0 or higher
