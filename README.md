@@ -2,7 +2,7 @@
 
 ## Disclaimer
 
-Since i did not have time to update this project with all the major changes on the project, this is currently dead for now.
+Since i did not have time to update this project with all the major changes on the libraries used for twitter/twitch/etc, it is dead for now.
 If you try it, it will probably simply don't work.
 
 ## Prerequisite
